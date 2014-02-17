@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Geeoz Software
+ * Copyright 2014 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,9 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,7 +57,7 @@ import static org.junit.Assert.fail;
  * @author Alex Voloshyn
  * @author Mike Dolinin
  * @author Serge Voloshyn
- * @version 1.12 11/6/2013
+ * @version 1.13 2/17/2014
  */
 public final class BrowserSteps extends Matchers {
     /**
@@ -228,7 +230,6 @@ public final class BrowserSteps extends Matchers {
         final URL resource = Thread.currentThread().getContextClassLoader()
                 .getResource(fileRelativePath);
         assert resource != null;
-//        fill(identity, resource.getFile());
         final WebElement element = browser.base().findElement(By.id(identity));
 
         if (element.isDisplayed()) {
@@ -252,32 +253,12 @@ public final class BrowserSteps extends Matchers {
     }
 
     /**
-     * Retrieve an web element that should be visible on current page.
+     * Retrieve an web elements that should be visible on current page.
      *
      * @param identity an identity of the element
-     * @return a web element that was found
-     */
-    private WebElement getVisibleElement(final String identity) {
-        return browser.base().findElement(getVisibleSelector(identity));
-    }
-
-    /**
-     * Retrieve web elements which may be visible on current page.
-     *
-     * @param identity an identity of the element
-     * @return web elements which were found
+     * @return a web elements that was found
      */
     private List<WebElement> getVisibleElements(final String identity) {
-        return browser.base().findElements(getVisibleSelector(identity));
-    }
-
-    /**
-     * Retrieve web element selector by different "By" attributes.
-     *
-     * @param identity an identity of the element
-     * @return a selector that has visible state
-     */
-    private By getVisibleSelector(final String identity) {
         final By[] selectors = {
                 By.id(identity),
                 By.xpath(Resources.base().identityXpath(identity)),
@@ -286,26 +267,33 @@ public final class BrowserSteps extends Matchers {
                 By.cssSelector(identity),
                 By.xpath(identity)};
         for (By selector : selectors) {
-            if (isElementDisplayed(selector)) {
-                return selector;
+            List<WebElement> elements = browser.base().findElements(selector);
+            if (!elements.isEmpty()) {
+                List<WebElement> visibleElements = new ArrayList<>(
+                        elements.size());
+                for (WebElement element : elements) {
+                    if (element.isDisplayed()) {
+                        visibleElements.add(element);
+                    }
+                }
+                if (!visibleElements.isEmpty()) {
+                    return visibleElements;
+                }
             }
         }
-        return selectors[0];
+        throw new NoSuchElementException(
+                "Could not find any visible element with identity - "
+                + identity);
     }
 
     /**
-     * Check selector for the displayed state.
+     * Retrieve web element which may be visible on current page.
      *
-     * @param selector selector that should be check for displayed state
-     * @return true if selector is displayed
+     * @param identity an identity of the element
+     * @return web element which were found
      */
-    private boolean isElementDisplayed(final By selector) {
-        try {
-            return browser.base().findElement(selector).isDisplayed();
-        } catch (Exception e) {
-            LOG.log(Level.FINE, e.getMessage(), e.getCause());
-        }
-        return false;
+    private WebElement getVisibleElement(final String identity) {
+        return getVisibleElements(identity).get(0);
     }
 
     /**

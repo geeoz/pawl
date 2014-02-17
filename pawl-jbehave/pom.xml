@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ Copyright 2013 Geeoz Software
+  ~ Copyright 2014 Geeoz Software
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -25,11 +25,6 @@
         <!-- Java-based framework supporting Behaviour-Driven Development (BDD),
              an evolution of Test-Driven Development (TDD) and Acceptance-Test
              Driven Development (ATDD). -->
-        <dependency>
-            <groupId>org.jbehave</groupId>
-            <artifactId>jbehave-core</artifactId>
-            <version>${jbehave-core.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.jbehave.web</groupId>
             <artifactId>jbehave-web-selenium</artifactId>

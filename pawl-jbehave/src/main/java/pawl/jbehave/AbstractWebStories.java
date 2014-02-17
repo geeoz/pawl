@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Geeoz Software
+ * Copyright 2014 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,9 +53,13 @@ import static org.jbehave.core.reporters.Format.TXT;
  * @see pawl.jbehave.step.BrowserSteps#openContextPath(String)
  * @see pawl.jbehave.step.BrowserSteps#refreshPage()
  * @see pawl.jbehave.step.BrowserSteps#wait(String)
+ * @see pawl.jbehave.step.BrowserSteps#choose(String, String, String)
  * @see pawl.jbehave.step.BrowserSteps#click(String)
+ * @see pawl.jbehave.step.BrowserSteps#clickWithOffset(String, String, String)
  * @see pawl.jbehave.step.BrowserSteps#clickOnLinkWithAttribute(String)
  * @see pawl.jbehave.step.BrowserSteps#fill(String, String)
+ * @see pawl.jbehave.step.BrowserSteps#fillFile(String, String)
+ * @see pawl.jbehave.step.BrowserSteps#select(String, String)
  * @see pawl.jbehave.step.BrowserSteps#storeTextFromElement(String, String)
  * @see pawl.jbehave.step.BrowserSteps#switchToNewWindow()
  * @see pawl.jbehave.step.BrowserSteps#verifyTitle(String)
@@ -63,6 +67,7 @@ import static org.jbehave.core.reporters.Format.TXT;
  * @see pawl.jbehave.step.BrowserSteps#verifyElement(String)
  * @see pawl.jbehave.step.BrowserSteps#verifyLink(String)
  * @see pawl.jbehave.step.BrowserSteps#verifyElementText(String, String)
+ * @see pawl.jbehave.step.BrowserSteps#verifyElementIsNotPresent(String)
  */
 public abstract class AbstractWebStories extends JUnitStories {
     /**
