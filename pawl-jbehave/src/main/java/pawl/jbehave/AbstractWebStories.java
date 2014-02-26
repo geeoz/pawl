@@ -25,13 +25,13 @@ import org.jbehave.core.reporters.StoryReporterBuilder;
 import org.jbehave.core.steps.InjectableStepsFactory;
 import org.jbehave.core.steps.InstanceStepsFactory;
 import org.jbehave.web.selenium.PerStoriesWebDriverSteps;
-import org.jbehave.web.selenium.PropertyWebDriverProvider;
 import org.jbehave.web.selenium.SeleniumConfiguration;
 import org.jbehave.web.selenium.SeleniumContext;
 import org.jbehave.web.selenium.WebDriverProvider;
 import org.jbehave.web.selenium.WebDriverScreenshotOnFailure;
 import org.jbehave.web.selenium.WebDriverSteps;
 import pawl.util.Resources;
+import pawl.webdriver.LocalizedWebDriverProvider;
 
 import java.util.List;
 
@@ -46,8 +46,9 @@ import static org.jbehave.core.reporters.Format.TXT;
  * properties.
  *
  * @author Alex Voloshyn
+ * @author Mike Dolinin
  * @author Serge Voloshyn
- * @version 1.4 6/9/2013
+ * @version 1.5 2/26/14
  * @see pawl.jbehave.step.BrowserSteps#setupLink(String)
  * @see pawl.jbehave.step.BrowserSteps#openUrl()
  * @see pawl.jbehave.step.BrowserSteps#openContextPath(String)
@@ -74,7 +75,7 @@ public abstract class AbstractWebStories extends JUnitStories {
      * JBehave web driver provider.
      */
     private final transient WebDriverProvider driverProvider =
-            new PropertyWebDriverProvider();
+            new LocalizedWebDriverProvider();
     /**
      * JBehave web driver provider.
      */

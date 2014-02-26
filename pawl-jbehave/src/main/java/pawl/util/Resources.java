@@ -16,6 +16,7 @@
 
 package pawl.util;
 
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -44,7 +45,7 @@ import java.util.logging.Logger;
  *
  * @author Alex Voloshyn
  * @author Mike Dolinin
- * @version 1.3 7/21/2013
+ * @version 1.4 2/26/14
  * @see ResourceBundle
  */
 public final class Resources {
@@ -80,7 +81,8 @@ public final class Resources {
      */
     private Resources(final String baseName) {
         this();
-        bundle = ResourceBundle.getBundle(baseName);
+        Locale locale = new Locale(System.getProperty("user.language"));
+        bundle = ResourceBundle.getBundle(baseName, locale);
     }
 
     /**

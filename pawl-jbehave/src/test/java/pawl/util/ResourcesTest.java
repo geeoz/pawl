@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.is;
  * Resources contain objects from different areas.
  *
  * @author Alex Voloshyn
- * @version 1.0 12/14/13
+ * @version 1.1 2/26/14
  */
 public class ResourcesTest {
     @Test
@@ -34,5 +34,12 @@ public class ResourcesTest {
         final Resources resources = Resources.get("base-default");
         assertThat("Should retrieve value from default properties.",
                 resources.explicitWait(), is(equalTo(30)));
+    }
+
+    @Test
+    public void shouldRetrieveValueFromBaseProperties() {
+        System.setProperty("user.language", "ru");
+        final Resources resources = Resources.base();
+        assertThat(resources.string("@login.text"), is(equalTo("Логин")));
     }
 }
