@@ -21,7 +21,7 @@
     <!-- The basics -->
     <groupId>com.geeoz.pawl</groupId>
     <artifactId>pawl</artifactId>
-    <version>1.0d4-SNAPSHOT</version>
+    <version>1.0d4</version>
     <packaging>pom</packaging>
 
     <dependencyManagement>
@@ -425,7 +425,7 @@
         <connection>scm:git:ssh://git@bitbucket.org/geeoz/pawl</connection>
         <developerConnection>scm:git:ssh://git@bitbucket.org/geeoz/pawl</developerConnection>
         <url>https://bitbucket.org/geeoz/pawl</url>
-        <tag>develop</tag>
+        <tag>1.0d4</tag>
     </scm>
 
     <!-- Describes the prerequisites a project can have. -->
