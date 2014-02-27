@@ -20,6 +20,8 @@ import org.jbehave.web.selenium.PropertyWebDriverProvider;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 
+import java.util.Locale;
+
 /**
  * Provide localization support for different browsers.
  *
@@ -30,7 +32,11 @@ public class LocalizedWebDriverProvider extends PropertyWebDriverProvider {
     /**
      * User language property name.
      */
-    public static final String USER_LANGUAGE = "user.language";
+    public static final String LANGUAGE = "user.language";
+    /**
+     * User country property name.
+     */
+    public static final String COUNTRY = "user.country";
 
     /**
      * Provide new Firefox driver with setup of user language.
@@ -39,8 +45,14 @@ public class LocalizedWebDriverProvider extends PropertyWebDriverProvider {
      */
     protected FirefoxDriver createFirefoxDriver() {
         FirefoxProfile firefoxProfile = new FirefoxProfile();
-        firefoxProfile.setPreference("intl.accept_languages",
-                System.getProperty(USER_LANGUAGE));
+        final String language;
+        if (System.getProperty(COUNTRY) == null) {
+            language = System.getProperty(LANGUAGE);
+        } else {
+            language = System.getProperty(LANGUAGE) + "-"
+                    + System.getProperty(COUNTRY).toLowerCase(Locale.ENGLISH);
+        }
+        firefoxProfile.setPreference("intl.accept_languages", language);
         return new FirefoxDriver(firefoxProfile);
     }
 }
