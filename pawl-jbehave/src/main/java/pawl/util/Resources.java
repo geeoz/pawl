@@ -16,7 +16,10 @@
 
 package pawl.util;
 
+import com.google.common.collect.Maps;
+
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -45,7 +48,7 @@ import java.util.logging.Logger;
  *
  * @author Alex Voloshyn
  * @author Mike Dolinin
- * @version 1.4 2/26/14
+ * @version 1.5 2/27/14
  * @see ResourceBundle
  */
 public final class Resources {
@@ -62,6 +65,12 @@ public final class Resources {
      * System base name for resource bundle.
      */
     private static final String SYSTEM_BASE_NAME = "base-default";
+    /**
+     * Specifies map to store test session data.
+     */
+    private static final ThreadLocal<Map<String, String>> CONTEXT =
+            new ThreadLocal<>();
+
     /**
      * Resource bundle.
      */
@@ -103,6 +112,18 @@ public final class Resources {
      */
     public static Resources base() {
         return get(DEFAULT_BASE_NAME);
+    }
+
+    /**
+     * Get context map.
+     *
+     * @return a context map
+     */
+    public static Map<String, String> context() {
+        if (CONTEXT.get() == null) {
+            CONTEXT.set(Maps.<String, String>newConcurrentMap());
+        }
+        return CONTEXT.get();
     }
 
     /**

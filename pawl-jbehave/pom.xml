@@ -41,6 +41,17 @@
             <artifactId>selenium-java</artifactId>
             <version>${selenium-java.version}</version>
         </dependency>
+        <!-- GreenMail is an open source, intuitive and easy-to-use test
+             suite of email servers for testing purposes. -->
+        <dependency>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail</artifactId>
+        </dependency>
+        <!-- jsoup is a Java library for working with real-world HTML. -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+        </dependency>
     </dependencies>
 
     <parent>

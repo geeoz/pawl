@@ -16,7 +16,6 @@
 
 package pawl.jbehave.step;
 
-import com.google.common.collect.Maps;
 import org.hamcrest.Matchers;
 import org.jbehave.core.annotations.Alias;
 import org.jbehave.core.annotations.Given;
@@ -35,10 +34,9 @@ import pawl.util.Resources;
 
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Level;
@@ -57,7 +55,7 @@ import static org.junit.Assert.fail;
  * @author Alex Voloshyn
  * @author Mike Dolinin
  * @author Serge Voloshyn
- * @version 1.13 2/17/2014
+ * @version 1.14 2/27/14
  */
 public final class BrowserSteps extends Matchers {
     /**
@@ -75,19 +73,13 @@ public final class BrowserSteps extends Matchers {
     private transient String url;
 
     /**
-     * Specifies map to store test session data.
-     */
-    private transient Map<String, String> testSessionStore;
-
-    /**
      * Create steps object that contains pages collection.
      *
      * @param pages factory of the page handlers
      */
     public BrowserSteps(final Pages pages) {
         super();
-        this.browser = pages;
-        testSessionStore = Maps.newConcurrentMap();
+        browser = pages;
     }
 
     /**
@@ -97,7 +89,11 @@ public final class BrowserSteps extends Matchers {
      */
     @Given("an '$key' link")
     public void setupLink(final String key) {
-        url = Resources.base().string(key);
+        if (Resources.context().containsKey(key)) {
+            url = Resources.context().get(key);
+        } else {
+            url = Resources.base().string(key);
+        }
     }
 
     /**
@@ -283,7 +279,7 @@ public final class BrowserSteps extends Matchers {
         }
         throw new NoSuchElementException(
                 "Could not find any visible element with identity - "
-                + identity);
+                        + identity);
     }
 
     /**
@@ -318,7 +314,8 @@ public final class BrowserSteps extends Matchers {
     public void fill(final String identity, final String text) {
         final WebElement element = getVisibleElement(identity);
         element.clear();
-        element.sendKeys(getTextFromStorageIfExist(text));
+        element.sendKeys(getTextFromStorageIfExist(
+                Resources.base().string(text, text)));
     }
 
     /**
@@ -332,7 +329,7 @@ public final class BrowserSteps extends Matchers {
     public void select(final String identity, final String value) {
         final WebElement element = getVisibleElement(identity);
         final Select select = new Select(element);
-        select.selectByVisibleText(value);
+        select.selectByVisibleText(Resources.base().string(value, value));
     }
 
     /**
@@ -342,7 +339,7 @@ public final class BrowserSteps extends Matchers {
      * @return a text from test session store
      */
     private String getTextFromStorageIfExist(final String text) {
-        final String storedText = testSessionStore.get(text);
+        final String storedText = Resources.context().get(text);
         if (storedText != null) {
             return storedText;
         }
@@ -357,7 +354,8 @@ public final class BrowserSteps extends Matchers {
     @Then("I get title '$title'")
     public void verifyTitle(final String title) {
         assertThat("The page title should be as follow.",
-                browser.base().getTitle(), equalTo(title));
+                browser.base().getTitle(),
+                equalTo(Resources.base().string(title, title)));
     }
 
     /**
@@ -369,7 +367,8 @@ public final class BrowserSteps extends Matchers {
     @Alias("text '$text'")
     public void verifySource(final String text) {
         assertTrue("Page source should contains the text.",
-                browser.base().getPageSource().contains(text));
+                browser.base().getPageSource().contains(
+                        Resources.base().string(text, text)));
     }
 
     /**
@@ -424,10 +423,11 @@ public final class BrowserSteps extends Matchers {
         final WebElement element = getVisibleElement(identity);
         assertThat("Page element should exists: '" + identity + "'",
                 element, is(notNullValue()));
+        final String value = Resources.base().string(text, text);
         assertThat(String.format(
-                "Page element '%s' should have text: '%s'", identity, text),
+                "Page element '%s' should have text: '%s'", identity, value),
                 getTextFrom(element),
-                is(equalTo(getTextFromStorageIfExist(text))));
+                is(equalTo(getTextFromStorageIfExist(value))));
     }
 
     /**
@@ -460,7 +460,7 @@ public final class BrowserSteps extends Matchers {
      */
     @When("I remember text from '$identity' to '$key' variable")
     public void storeTextFromElement(final String identity, final String key) {
-        testSessionStore.put(key, getTextFrom(getVisibleElement(identity)));
+        Resources.context().put(key, getTextFrom(getVisibleElement(identity)));
     }
 
     /**
