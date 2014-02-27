@@ -33,12 +33,14 @@ import static org.hamcrest.Matchers.is;
 /**
  * Resources contain objects from different areas.
  *
+ * @author Alex Voloshyn
  * @author Mike Dolinin
- * @version 1.0 2/26/14
+ * @version 1.1 2/27/14
  */
 
 public class BrowserTest {
     public static final String USER_LANGUAGE = "user.language";
+    public static final String USER_COUNTRY = "user.country";
     private URL l10nPage;
     private LocalizedWebDriverProvider driverProvider;
 
@@ -51,11 +53,13 @@ public class BrowserTest {
     @Test
     public void changeLocaleInBrowser() throws InterruptedException {
         System.setProperty(USER_LANGUAGE, "en");
+        System.setProperty(USER_COUNTRY, "US");
         driverProvider.initialize();
         WebDriver webDriver = driverProvider.get();
         webDriver.get(l10nPage.toExternalForm());
         WebElement info = webDriver.findElement(By.id("info"));
-        assertThat(info.getText(), is(equalTo("You are viewing an English localization of this page.")));
+        assertThat(info.getText(),
+                is(equalTo("You are viewing an American English localization of this page.")));
     }
 
     @After
