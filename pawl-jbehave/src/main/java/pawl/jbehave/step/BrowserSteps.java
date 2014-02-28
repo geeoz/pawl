@@ -22,6 +22,7 @@ import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 import org.openqa.selenium.By;
+import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -396,7 +397,7 @@ public final class BrowserSteps extends Matchers {
         try {
             assertThat("Page element should not exists: '" + identity,
                     getVisibleElements(identity).size(), is(equalTo(0)));
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException | InvalidSelectorException e) {
             LOG.fine(e.getMessage());
         }
     }
