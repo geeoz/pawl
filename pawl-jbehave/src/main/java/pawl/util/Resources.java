@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  *
  * @author Alex Voloshyn
  * @author Mike Dolinin
- * @version 1.5 2/27/14
+ * @version 1.6 2/28/14
  * @see ResourceBundle
  */
 public final class Resources {
@@ -90,7 +90,9 @@ public final class Resources {
      */
     private Resources(final String baseName) {
         this();
-        Locale locale = new Locale(System.getProperty("user.language"));
+        Locale locale = new Locale(
+                System.getProperty("user.language"),
+                System.getProperty("user.country"));
         bundle = ResourceBundle.getBundle(baseName, locale);
     }
 
