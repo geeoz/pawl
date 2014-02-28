@@ -393,8 +393,12 @@ public final class BrowserSteps extends Matchers {
     @Then("I get no '$identity' element")
     @Alias("no '$elementId' element")
     public void verifyElementIsNotPresent(final String identity) {
-        assertThat("Page element should not exists: '" + identity,
-                getVisibleElements(identity).size(), is(equalTo(0)));
+        try {
+            assertThat("Page element should not exists: '" + identity,
+                    getVisibleElements(identity).size(), is(equalTo(0)));
+        } catch (NoSuchElementException e) {
+            LOG.fine(e.getMessage());
+        }
     }
 
     /**
