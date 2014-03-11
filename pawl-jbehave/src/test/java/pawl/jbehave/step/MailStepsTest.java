@@ -21,6 +21,9 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import org.junit.Test;
 import pawl.util.Resources;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -30,7 +33,8 @@ import static org.hamcrest.Matchers.nullValue;
  * Email test server steps verification.
  *
  * @author Alex Voloshyn
- * @version 1.0 2/27/14
+ * @author Serge Voloshyn
+ * @version 1.1 3/11/14
  */
 public class MailStepsTest {
     /**
@@ -41,14 +45,17 @@ public class MailStepsTest {
         final MailSteps steps = new MailSteps();
         steps.startEmailTestServer();
         final GreenMail greenMail = steps.getGreenMail();
-        GreenMailUtil.sendTextEmailTest(
-                "to@localhost.com", "from@localhost.com", "subject", "body");
-        assertThat("Email body should be the same",
-                "body",
-                is(equalTo(
-                        GreenMailUtil.getBody(
-                                greenMail.getReceivedMessages()[0]))));
-        greenMail.stop();
+        try {
+            GreenMailUtil.sendTextEmailTest(
+                    "to@localhost.com", "from@localhost.com", "subject", "body");
+            assertThat("Email body should be the same",
+                    "body",
+                    is(equalTo(
+                            GreenMailUtil.getBody(
+                                    greenMail.getReceivedMessages()[0]))));
+        } finally {
+            greenMail.stop();
+        }
     }
 
     /**
@@ -59,12 +66,35 @@ public class MailStepsTest {
         final MailSteps steps = new MailSteps();
         steps.startEmailTestServer();
         final GreenMail greenMail = steps.getGreenMail();
-        GreenMailUtil.sendTextEmailTest(
-                "to@localhost.com", "from@localhost.com", "subject1", "body");
-        GreenMailUtil.sendTextEmailTest(
-                "to@localhost.com", "from@localhost.com", "subject2", "body");
-        steps.verifyLastEmailSubject("subject2");
-        greenMail.stop();
+        try {
+            GreenMailUtil.sendTextEmailTest(
+                    "to@localhost.com", "from@localhost.com", "subject1", "body");
+            GreenMailUtil.sendTextEmailTest(
+                    "to@localhost.com", "from@localhost.com", "subject2", "body");
+            steps.verifyLastEmailSubject("subject2");
+        } finally {
+            greenMail.stop();
+        }
+    }
+
+    /**
+     * Verify that THEN step verify last email subject.
+     */
+    @Test
+    public void shouldCheckLastEmailSubjectRU() throws MessagingException,
+            UnsupportedEncodingException {
+        final MailSteps steps = new MailSteps();
+        steps.startEmailTestServer();
+        final GreenMail greenMail = steps.getGreenMail();
+        try {
+            GreenMailUtil.sendTextEmailTest(
+                    "to@localhost.com", "from@localhost.com", "темма", "body");
+            GreenMailUtil.sendTextEmailTest(
+                    "to@localhost.com", "from@localhost.com", "тема2", "body");
+            steps.verifyLastEmailSubject("тема2");
+        } finally {
+            greenMail.stop();
+        }
     }
 
     /**
@@ -75,26 +105,29 @@ public class MailStepsTest {
         final MailSteps steps = new MailSteps();
         steps.startEmailTestServer();
         final GreenMail greenMail = steps.getGreenMail();
-        GreenMailUtil.sendTextEmailTest(
-                "to@localhost.com", "from@localhost.com", "subject",
-                "body with <a id=\"id\" href=\"http://localhost\">Link</a>");
+        try {
+            GreenMailUtil.sendTextEmailTest(
+                    "to@localhost.com", "from@localhost.com", "subject",
+                    "body with <a id=\"id\" href=\"http://localhost\">Link</a>");
 
-        assertThat("Values should be empty.",
-                Resources.context().get("key"), is(nullValue()));
+            assertThat("Values should be empty.",
+                    Resources.context().get("key"), is(nullValue()));
 
-        steps.storeLinkFromElement("id", "key");
-        assertThat("Values should be the same.",
-                Resources.context().get("key"),
-                is(equalTo("http://localhost")));
+            steps.storeLinkFromElement("id", "key");
+            assertThat("Values should be the same.",
+                    Resources.context().get("key"),
+                    is(equalTo("http://localhost")));
 
-        Resources.context().put("key", "123");
-        GreenMailUtil.sendTextEmailTest(
-                "to@localhost.com", "from@localhost.com", "subject",
-                "body with <a id='id' href='http://localhost'/>");
-        steps.storeLinkFromElement("id", "key");
-        assertThat("Values should be the same.",
-                Resources.context().get("key"),
-                is(equalTo("http://localhost")));
-        greenMail.stop();
+            Resources.context().put("key", "123");
+            GreenMailUtil.sendTextEmailTest(
+                    "to@localhost.com", "from@localhost.com", "subject",
+                    "body with <a id='id' href='http://localhost'/>");
+            steps.storeLinkFromElement("id", "key");
+            assertThat("Values should be the same.",
+                    Resources.context().get("key"),
+                    is(equalTo("http://localhost")));
+        } finally {
+            greenMail.stop();
+        }
     }
 }
