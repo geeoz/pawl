@@ -381,7 +381,7 @@
     <!-- More project information -->
     <name>PAWL</name>
     <description>A project to aid with test automation.</description>
-    <url>https://bitbucket.org/geeoz/travelport-api</url>
+    <url>https://bitbucket.org/geeoz/pawl</url>
 
     <licenses>
         <license>
