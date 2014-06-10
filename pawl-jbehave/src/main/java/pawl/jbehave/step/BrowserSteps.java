@@ -184,7 +184,10 @@ public final class BrowserSteps extends Matchers {
         final Actions builder = new Actions(browser.base());
         builder.moveToElement(webElement,
                 Integer.parseInt(xOffset), Integer.parseInt(yOffset))
-                .click().perform();
+                // change after
+                // https://code.google.com/p/selenium/issues/detail?id=6141
+                // fixed
+                .clickAndHold().release().perform();
     }
 
     /**
