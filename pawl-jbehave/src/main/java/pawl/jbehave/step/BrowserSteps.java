@@ -259,13 +259,20 @@ public final class BrowserSteps extends Matchers {
      * @return a web elements that was found
      */
     private List<WebElement> getVisibleElements(final String identity) {
-        final By[] selectors = {
+        By[] selectors = {
                 By.id(identity),
                 By.xpath(Resources.base().identityXpath(identity)),
                 By.name(identity),
                 By.className(identity),
                 By.cssSelector(identity),
                 By.xpath(identity)};
+        if (identity.matches("^[0-9]")) {
+            selectors = new By[]{
+                    By.id(identity),
+                    By.name(identity)};
+            LOG.fine("Identity starts with numbers it could be only "
+                    + "id or name.");
+        }
         for (By selector : selectors) {
             List<WebElement> elements = browser.base().findElements(selector);
             if (!elements.isEmpty()) {
