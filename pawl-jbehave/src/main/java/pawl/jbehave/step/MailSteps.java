@@ -53,8 +53,10 @@ public final class MailSteps extends Matchers {
      */
     @Given("an email test server")
     public void startEmailTestServer() {
-        greenMail = new GreenMail(); //uses test ports by default
-        greenMail.start();
+        if (greenMail == null) {
+            greenMail = new GreenMail(); //uses test ports by default
+            greenMail.start();
+        }
     }
 
     /**
