@@ -169,7 +169,7 @@ public final class BrowserSteps extends Matchers {
     }
 
     /**
-     * Action for click the web element with XY offsets.
+     * Action for click the web element with XY offsets from center of element.
      *
      * @param identity element identity for search
      * @param xOffset  X-offset for click
@@ -182,12 +182,12 @@ public final class BrowserSteps extends Matchers {
                                 final String yOffset) {
         final WebElement webElement = getVisibleElement(identity);
         final Actions builder = new Actions(browser.base());
-        builder.moveToElement(webElement,
+        builder.moveToElement(webElement).moveByOffset(
                 Integer.parseInt(xOffset), Integer.parseInt(yOffset))
                 // change after
                 // https://code.google.com/p/selenium/issues/detail?id=6141
                 // fixed
-                .clickAndHold().release().perform();
+                .click().perform();
     }
 
     /**
