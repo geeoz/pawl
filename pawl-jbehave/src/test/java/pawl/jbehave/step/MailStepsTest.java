@@ -25,9 +25,7 @@ import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Email test server steps verification.
@@ -72,6 +70,39 @@ public class MailStepsTest {
             GreenMailUtil.sendTextEmailTest(
                     "to@localhost.com", "from@localhost.com", "subject2", "body");
             steps.verifyLastEmailSubject("subject2");
+        } finally {
+            greenMail.stop();
+        }
+    }
+
+    /**
+     * Verify that THEN step verify last email subject
+     * with polling if email is not received yet
+     */
+    @Test
+    public void shouldCheckLastEmailSubjectWithPolling()
+            throws InterruptedException {
+        final MailSteps steps = new MailSteps();
+        steps.startEmailTestServer();
+        final GreenMail greenMail = steps.getGreenMail();
+        try {
+            Runnable sendEmailAfterFewSeconds = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.currentThread().sleep(
+                                Resources.base().pollingInterval() - 100);
+                        GreenMailUtil.sendTextEmailTest(
+                                "to@localhost.com",
+                                "from@localhost.com", "subject4", "body");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            Thread t = new Thread(sendEmailAfterFewSeconds);
+            t.start();
+            steps.verifyLastEmailSubject("subject4");
         } finally {
             greenMail.stop();
         }

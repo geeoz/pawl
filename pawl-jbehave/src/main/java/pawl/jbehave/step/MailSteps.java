@@ -28,10 +28,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import pawl.util.Resources;
 
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static pawl.jbehave.matchers.IsReceivedEmailWithSubject.
+        receivedEmailWithSubject;
 
 /**
  * <code>MailSteps</code> a simple POJO, which will contain the Java methods
@@ -67,14 +68,8 @@ public final class MailSteps extends Matchers {
     @Then("I get email with '$subject' subject")
     @Alias("email with '$subject' subject")
     public void verifyLastEmailSubject(final String subject) {
-        try {
-            final MimeMessage[] messages = greenMail.getReceivedMessages();
-            assertThat("Email subjects should be the same.",
-                    messages[messages.length - 1].getSubject(),
-                    is(equalTo(Resources.base().string(subject, subject))));
-        } catch (MessagingException e) {
-            throw new IllegalStateException(e);
-        }
+        String subjectValue = Resources.base().string(subject, subject);
+        assertThat(greenMail, is(receivedEmailWithSubject(subjectValue)));
     }
 
     /**

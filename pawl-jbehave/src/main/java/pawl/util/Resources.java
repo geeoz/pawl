@@ -175,6 +175,15 @@ public final class Resources {
     }
 
     /**
+     * Return value for polling interval.
+     *
+     * @return polling interval time
+     */
+    public int pollingInterval() {
+        return Integer.parseInt(string("polling.interval.milliseconds"));
+    }
+
+    /**
      * Return web stories for run.
      *
      * @return path patters for story paths
