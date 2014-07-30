@@ -23,6 +23,7 @@ import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidSelectorException;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -327,6 +328,19 @@ public final class BrowserSteps extends Matchers {
         element.clear();
         element.sendKeys(getTextFromStorageIfExist(
                 Resources.base().string(text, text)));
+    }
+
+    /**
+     * Action for press ENTER key.
+     *
+     * @param identity element identity for search
+     */
+    @When("I press ENTER on '$identity'")
+    @Alias("press ENTER on '$identity'")
+    public void pressEnter(final String identity) {
+        final WebElement element = getVisibleElement(identity);
+        element.clear();
+        element.sendKeys(Keys.ENTER);
     }
 
     /**
