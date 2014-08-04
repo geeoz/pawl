@@ -57,6 +57,7 @@ public class BrowserStepsTest {
         browserSteps.openUrl();
         browserSteps.verifyElementText("user", "No name");
         browserSteps.fill("user-name", "John Doe");
+        browserSteps.pressEnter("user-name");
         browserSteps.click("add-cookies");
         browserSteps.verifyElementText("user", "John Doe");
         browserSteps.refreshPage();

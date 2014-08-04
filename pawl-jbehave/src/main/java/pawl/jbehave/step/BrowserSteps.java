@@ -341,7 +341,6 @@ public final class BrowserSteps extends Matchers {
     @Alias("press ENTER on '$identity'")
     public void pressEnter(final String identity) {
         final WebElement element = getVisibleElement(identity);
-        element.clear();
         element.sendKeys(Keys.ENTER);
     }
 
