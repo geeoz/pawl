@@ -23,8 +23,6 @@ import pawl.jbehave.Pages;
 import pawl.webdriver.LocalizedWebDriverProvider;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Steps in browser verification.
@@ -36,6 +34,7 @@ public class BrowserStepsTest {
 
     private URL cookiesPageUrl;
     private LocalizedWebDriverProvider driverProvider;
+    private Pages pages;
 
     @Before
     public void openStaticPage(){
@@ -44,31 +43,19 @@ public class BrowserStepsTest {
         driverProvider = new LocalizedWebDriverProvider();
         driverProvider.initialize();
         System.setProperty("empty-title", "");
+        pages = new Pages(driverProvider);
     }
 
-    /**
-    * Verify that email test server was started after given step call.
-    */
     @Test
-    public void shouldReopenBrowserWithDefinedCookiesFromPreviousSession() {
-        Pages pages = new Pages(driverProvider);
+    public void shouldDeleteUserSessionCookieAndRefreshThePage() {
         BrowserSteps browserSteps = new BrowserSteps(pages);
         browserSteps.setupLink("cookies_test_page");
         browserSteps.openUrl();
-        browserSteps.verifyElementText("user", "No name");
-        browserSteps.fill("user-name", "John Doe");
-        browserSteps.pressEnter("user-name");
-        browserSteps.click("add-cookies");
-        browserSteps.verifyElementText("user", "John Doe");
-        browserSteps.refreshPage();
-        browserSteps.verifyElementText("user", "John Doe");
-        List<String> cookieKeys = new ArrayList<>();
-        cookieKeys.add("user_name");
-        browserSteps.reopenBrowserWithCookies(cookieKeys);
-        browserSteps.verifyTitle("empty-title");
-        browserSteps.setupLink("cookies_test_page");
-        browserSteps.openUrl();
-        browserSteps.verifyElementText("user", "John Doe");
+        browserSteps.verifyElementText("session-status", "Your session is expired!");
+        browserSteps.click("start-new-session");
+        browserSteps.verifyElementText("session-status", "Your session is xZ9TPyIvNgxP");
+        browserSteps.expireUserSession();
+        browserSteps.verifyElementText("session-status", "Your session is expired!");
     }
 
     @After

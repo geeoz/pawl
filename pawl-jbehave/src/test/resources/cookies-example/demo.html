@@ -26,13 +26,21 @@
             }
         </style>
     </head>
-    <body onload="loadNameFromCookie()">
+    <body onload="loadAllCookies()">
         <h1 id="title">Cookies demo</h1>
+        <p id="session-status">Your session is expired!</p>
+        <button id="start-new-session" type="button" onclick="createSessionCookie()">Start new session</button>
         <p id="user">No name</p>
         <label id="user-name-label" for="user-name">Enter new user name:</label>
         <input id="user-name" type="text">
         <button id="add-cookies" type="button" onclick="showNameAndSave()">Add name to cookies</button>
         <script type="text/javascript">
+
+            function loadAllCookies() {
+                showSessionIsExpired();
+                loadNameFromCookie();
+            }
+
             function setCookie(cname, cvalue, exdays) {
                 var d = new Date();
                 d.setTime(d.getTime() + (exdays*24*60*60*1000));
@@ -61,6 +69,30 @@
                 var oldName = getCookie('user_name');
                 if(oldName != ""){
                     document.getElementById('user').innerHTML = oldName;
+                }
+            }
+
+            function createSessionCookie() {
+                setCookie("JSESSIONID", "xZ9TPyIvNgxP", 3);
+                showSessionIsExpired();
+            }
+
+            function makeId() {
+                var text = "";
+                var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+                for( var i=0; i < 12; i++ )
+                    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+                return text;
+            }
+
+            function showSessionIsExpired() {
+                var sessionId = getCookie("JSESSIONID");
+                if (sessionId === "") {
+                    document.getElementById('session-status').innerHTML = "Your session is expired!";
+                } else {
+                    document.getElementById('session-status').innerHTML = "Your session is " + sessionId;
                 }
             }
 

@@ -21,9 +21,7 @@ import org.jbehave.core.annotations.Alias;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
-import org.jbehave.web.selenium.WebDriverPage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
 import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -494,22 +492,13 @@ public final class BrowserSteps extends Matchers {
     }
 
     /**
-     * Reopen browser with defined cookies from current session.
-     *
-     * @param keys of cookies to save and put in new session.
+     * Delete user session cookie and refresh the page.
      */
-    @When("reopen browser with $keys cookies from current session")
-    public void reopenBrowserWithCookies(final List<String> keys) {
-        List<Cookie> cookies = new ArrayList<>(keys.size());
-        WebDriverPage base = browser.base();
-        for (String key : keys) {
-            cookies.add(base.manage().getCookieNamed(key));
-        }
-        base = browser.renewBase();
-        base.get("");
-        for (Cookie cookie : cookies) {
-            base.manage().addCookie(cookie);
-        }
+    @When("user session is expired")
+    public void expireUserSession() {
+        browser.base().manage().deleteCookieNamed(
+                Resources.base().userSessionCookieName());
+        browser.base().navigate().refresh();
     }
 
     /**

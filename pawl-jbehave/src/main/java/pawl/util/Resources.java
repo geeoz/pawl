@@ -166,6 +166,15 @@ public final class Resources {
     }
 
     /**
+     * Return name of user session cookie.
+     *
+     * @return name
+     */
+    public String userSessionCookieName() {
+        return string("user.session.cookie.name");
+    }
+
+    /**
      * Return value for explicit wait.
      *
      * @return wait time

@@ -89,18 +89,6 @@ public final class Pages {
     }
 
     /**
-     * Web page handler for user actions.
-     *
-     * @return new common web page
-     */
-    public WebDriverPage renewBase() {
-        page.quit();
-        provider.initialize();
-        page = null;
-        return base();
-    }
-
-    /**
      * Base web page object that contains common methods.
      */
     static final class BasePage extends WebDriverPage {
