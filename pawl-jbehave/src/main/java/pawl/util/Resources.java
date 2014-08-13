@@ -193,6 +193,15 @@ public final class Resources {
     }
 
     /**
+     * Return quantity of threads for tests execution.
+     *
+     * @return quantity of threads for tests execution
+     */
+    public int useThreads() {
+        return Runtime.getRuntime().availableProcessors();
+    }
+
+    /**
      * Return web stories for run.
      *
      * @return path patters for story paths

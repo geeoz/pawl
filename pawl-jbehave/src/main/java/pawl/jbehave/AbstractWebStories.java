@@ -16,7 +16,6 @@
 
 package pawl.jbehave;
 
-import com.google.common.util.concurrent.MoreExecutors;
 import org.jbehave.core.configuration.Configuration;
 import org.jbehave.core.io.LoadFromClasspath;
 import org.jbehave.core.io.StoryFinder;
@@ -24,7 +23,7 @@ import org.jbehave.core.junit.JUnitStories;
 import org.jbehave.core.reporters.StoryReporterBuilder;
 import org.jbehave.core.steps.InjectableStepsFactory;
 import org.jbehave.core.steps.InstanceStepsFactory;
-import org.jbehave.web.selenium.PerStoriesWebDriverSteps;
+import org.jbehave.web.selenium.PerStoryWebDriverSteps;
 import org.jbehave.web.selenium.SeleniumConfiguration;
 import org.jbehave.web.selenium.SeleniumContext;
 import org.jbehave.web.selenium.WebDriverProvider;
@@ -80,7 +79,7 @@ public abstract class AbstractWebStories extends JUnitStories {
      * JBehave web driver provider.
      */
     private final transient WebDriverSteps lifecycleSteps =
-            new PerStoriesWebDriverSteps(driverProvider);
+            new PerStoryWebDriverSteps(driverProvider);
     /**
      * Web testing context.
      */
@@ -91,10 +90,10 @@ public abstract class AbstractWebStories extends JUnitStories {
      */
     public AbstractWebStories() {
         super();
-        // If configuring lifecycle per-stories, you need to ensure that you
-        // a same-thread executor
-        configuredEmbedder().useExecutorService(
-                MoreExecutors.sameThreadExecutor());
+        configuredEmbedder().embedderControls()
+                .useThreads(Resources.base().useThreads())
+                .doIgnoreFailureInStories(true)
+                .doBatch(true);
     }
 
     // Here we specify the configuration, starting from default
