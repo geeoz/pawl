@@ -94,6 +94,11 @@
         <!-- JBehave framework versions -->
         <jbehave-core.version>4.0-beta-8</jbehave-core.version>
         <jbehave-web-selenium.version>3.6-beta-2</jbehave-web-selenium.version>
+        <browser>phantomjs</browser>
+        <!-- A maven plugin for installing the phantomjs binary on your system automatically. -->
+        <phantomjs-maven-plugin.version>0.4</phantomjs-maven-plugin.version>
+        <!-- PhantomJS is a headless WebKit browser with a JavaScript API. -->
+        <phantomjs.version>1.9.7</phantomjs.version>
         <selenium-java.version>2.42.2</selenium-java.version>
         <commons-exec.version>1.2</commons-exec.version>
         <!-- Email test server versions -->
@@ -219,7 +224,12 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven-failsafe-plugin.version}</version>
                 <configuration>
-                    <argLine>${proxy.args}</argLine>
+                    <argLine>
+                        ${maven-surefire-plugin.encoding}
+                        ${proxy.args}
+                        -Dbrowser=${browser}
+                        -Dphantomjs.binary.path=${phantomjs.binary}
+                    </argLine>
                 </configuration>
                 <executions>
                     <execution>
@@ -229,6 +239,21 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.klieber</groupId>
+                <artifactId>phantomjs-maven-plugin</artifactId>
+                <version>${phantomjs-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>install</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <version>${phantomjs.version}</version>
+                </configuration>
             </plugin>
         </plugins>
         <pluginManagement>

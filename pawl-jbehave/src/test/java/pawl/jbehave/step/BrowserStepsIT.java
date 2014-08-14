@@ -30,7 +30,7 @@ import java.net.URL;
  * @author Mike Dolinin
  * @version 1.1 7/30/14
  */
-public class BrowserStepsTest {
+public class BrowserStepsIT {
 
     private URL cookiesPageUrl;
     private LocalizedWebDriverProvider driverProvider;
@@ -38,7 +38,7 @@ public class BrowserStepsTest {
 
     @Before
     public void openStaticPage(){
-        cookiesPageUrl = BrowserStepsTest.class.getResource("/cookies-example/demo.html");
+        cookiesPageUrl = BrowserStepsIT.class.getResource("/cookies-example/demo.html");
         System.setProperty("cookies_test_page", cookiesPageUrl.toExternalForm());
         driverProvider = new LocalizedWebDriverProvider();
         driverProvider.initialize();

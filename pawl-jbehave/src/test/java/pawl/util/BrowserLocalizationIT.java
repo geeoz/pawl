@@ -38,7 +38,7 @@ import static org.hamcrest.Matchers.is;
  * @version 1.1 2/27/14
  */
 
-public class BrowserTest {
+public class BrowserLocalizationIT {
     public static final String USER_LANGUAGE = "user.language";
     public static final String USER_COUNTRY = "user.country";
     private URL l10nPage;
@@ -46,7 +46,7 @@ public class BrowserTest {
 
     @Before
     public void openStaticPage(){
-        l10nPage = BrowserTest.class.getResource("/l10n-example/demo.html");
+        l10nPage = BrowserLocalizationIT.class.getResource("/l10n-example/demo.html");
         driverProvider = new LocalizedWebDriverProvider();
     }
 

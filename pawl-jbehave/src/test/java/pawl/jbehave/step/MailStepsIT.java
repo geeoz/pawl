@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.*;
  * @author Serge Voloshyn
  * @version 1.1 3/11/14
  */
-public class MailStepsTest {
+public class MailStepsIT {
     /**
      * Verify that email test server was started after given step call.
      */

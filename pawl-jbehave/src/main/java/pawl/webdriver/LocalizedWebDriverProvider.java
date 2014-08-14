@@ -17,8 +17,11 @@
 package pawl.webdriver;
 
 import org.jbehave.web.selenium.PropertyWebDriverProvider;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.util.Locale;
 
@@ -45,14 +48,37 @@ public class LocalizedWebDriverProvider extends PropertyWebDriverProvider {
      */
     protected FirefoxDriver createFirefoxDriver() {
         FirefoxProfile firefoxProfile = new FirefoxProfile();
-        final String language;
+        firefoxProfile.setPreference("intl.accept_languages",
+                getSystemLanguage());
+        return new FirefoxDriver(firefoxProfile);
+    }
+
+    /**
+     * Provide new PhantomJS driver with setup of user language.
+     *
+     * @return phantomjs driver
+     */
+    protected WebDriver createPhantomJSDriver() {
+        DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+        desiredCapabilities.setCapability(
+                "phantomjs.page.customHeaders.Accept-Language",
+                getSystemLanguage());
+        return new PhantomJSDriver(desiredCapabilities);
+    }
+
+    /**
+     * Provide system language key.
+     *
+     * @return language key
+     */
+    private String getSystemLanguage() {
+        String language;
         if (System.getProperty(COUNTRY) == null) {
             language = System.getProperty(LANGUAGE);
         } else {
             language = System.getProperty(LANGUAGE) + "-"
                     + System.getProperty(COUNTRY).toLowerCase(Locale.ENGLISH);
         }
-        firefoxProfile.setPreference("intl.accept_languages", language);
-        return new FirefoxDriver(firefoxProfile);
+        return language;
     }
 }
