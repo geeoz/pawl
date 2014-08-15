@@ -56,7 +56,7 @@ public class BrowserLocalizationIT {
         System.setProperty(USER_COUNTRY, "US");
         driverProvider.initialize();
         WebDriver webDriver = driverProvider.get();
-        webDriver.get(l10nPage.toExternalForm());
+        webDriver.get(l10nPage.toExternalForm() + "#en-US");
         WebElement info = webDriver.findElement(By.id("info"));
         assertThat(info.getText(),
                 is(equalTo("You are viewing an American English localization of this page.")));
