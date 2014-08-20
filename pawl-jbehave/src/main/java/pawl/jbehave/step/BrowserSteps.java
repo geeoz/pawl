@@ -25,14 +25,13 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import pawl.jbehave.Pages;
 import pawl.util.Resources;
+import pawl.util.WebExpectedConditions;
 
 import java.net.URL;
 import java.text.MessageFormat;
@@ -41,7 +40,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -127,35 +125,25 @@ public final class BrowserSteps extends Matchers {
     }
 
     /**
-     * Action to wait some time and then wait for all ajax responses.
-     *
-     * @param sec seconds to wait
+     * Action to wait with timeout for all ajax responses.
      */
-    @When("I wait '$sec' seconds")
-    @Alias("wait '$sec' seconds")
-    public void wait(final String sec) {
-        final int seconds = (int) (Double.parseDouble(sec) * 1000);
-        if (seconds > 0) {
-            try {
-                Thread.sleep(seconds);
-            } catch (InterruptedException e) {
-                LOG.log(Level.FINE, e.getMessage(), e.getCause());
-            }
-        }
+    private void waitForActiveAjaxRequestComplete() {
+        final WebDriverWait wait =
+                new WebDriverWait(browser.base(),
+                        Resources.base().explicitWait());
+        wait.until(WebExpectedConditions.get()
+                .complete("activeAjaxRequests()"));
+    }
 
-        Object callResult = browser.base().executeScript(
-                "return activeAjaxRequests();");
-        final long sleepTime = 100L;
-        while (callResult != null
-                && Long.parseLong(String.valueOf(callResult)) > 0) {
-            try {
-                Thread.sleep(sleepTime);
-            } catch (final InterruptedException e) {
-                LOG.log(Level.FINE, e.getMessage(), e.getCause());
-            }
-            callResult = browser.base().executeScript(
-                    "return activeAjaxRequests();");
-        }
+    /**
+     * Action to wait with timeout for all animations complete.
+     */
+    private void waitForActiveAnimationsComplete() {
+        final WebDriverWait wait =
+                new WebDriverWait(browser.base(),
+                        Resources.base().explicitWait());
+        wait.until(WebExpectedConditions.get()
+                .complete("activeAnimations()"));
     }
 
     /**
@@ -231,7 +219,7 @@ public final class BrowserSteps extends Matchers {
         final URL resource = Thread.currentThread().getContextClassLoader()
                 .getResource(fileRelativePath);
         assert resource != null;
-        final WebElement element = browser.base().findElement(By.id(identity));
+        final WebElement element = getVisibleElement(identity);
 
         if (element.isDisplayed()) {
             element.clear();
@@ -249,7 +237,7 @@ public final class BrowserSteps extends Matchers {
                         + "'}' else '{'document.getElementById(\"{0}\"')'"
                         + ".fireEvent(\"onchange\");'}'",
                 identity, resource.getFile());
-        System.err.println("Put new value script: " + putValue);
+        LOG.warning("Put new value script: " + putValue);
         browser.base().executeScript(putValue);
     }
 
@@ -260,6 +248,8 @@ public final class BrowserSteps extends Matchers {
      * @return a web elements that was found
      */
     private List<WebElement> getVisibleElements(final String identity) {
+        waitForActiveAjaxRequestComplete();
+        waitForActiveAnimationsComplete();
         By[] selectors = {
                 By.id(identity),
                 By.xpath(Resources.base().identityXpath(identity)),
@@ -516,31 +506,10 @@ public final class BrowserSteps extends Matchers {
         } else {
             final WebDriverWait wait =
                     new WebDriverWait(driver, Resources.base().explicitWait());
-            newWindow = wait.until(anyWindowOtherThan(opened));
+            newWindow = wait.until(WebExpectedConditions.get()
+                    .anyWindowOtherThan(opened));
         }
         driver.switchTo().window(newWindow);
     }
 
-    /**
-     * Retrieve an any other window than input.
-     *
-     * @param windows windows that should be excluded
-     * @return expected condition result
-     */
-    public static ExpectedCondition<String> anyWindowOtherThan(
-            final Set<String> windows) {
-        return new ExpectedCondition<String>() {
-            public String apply(final WebDriver driver) {
-                if (driver == null) {
-                    throw new WebDriverException();
-                }
-                final Set<String> all = driver.getWindowHandles();
-                all.removeAll(windows);
-                if (all.size() > 0) {
-                    return all.iterator().next();
-                }
-                return null;
-            }
-        };
-    }
 }
