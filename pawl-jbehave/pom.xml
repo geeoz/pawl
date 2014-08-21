@@ -68,7 +68,7 @@
     <parent>
         <groupId>com.geeoz.pawl</groupId>
         <artifactId>pawl</artifactId>
-        <version>1.0d18-SNAPSHOT</version>
+        <version>1.0d18</version>
     </parent>
 
     <properties>
