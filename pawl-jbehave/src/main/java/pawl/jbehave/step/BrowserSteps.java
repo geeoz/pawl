@@ -301,6 +301,8 @@ public final class BrowserSteps extends Matchers {
      */
     @When("I click on link '$href'")
     public void clickOnLinkWithAttribute(final String href) {
+        waitForActiveAjaxRequestComplete();
+        waitForActiveAnimationsComplete();
         browser.base().findElement(
                 By.xpath(".//a[@href='" + href + "']")).click();
     }
@@ -367,6 +369,8 @@ public final class BrowserSteps extends Matchers {
      */
     @Then("I get title '$title'")
     public void verifyTitle(final String title) {
+        waitForActiveAjaxRequestComplete();
+        waitForActiveAnimationsComplete();
         assertThat("The page title should be as follow.",
                 browser.base().getTitle(),
                 equalTo(Resources.base().string(title, title)));
@@ -380,6 +384,8 @@ public final class BrowserSteps extends Matchers {
     @Then("I get text '$text'")
     @Alias("text '$text'")
     public void verifySource(final String text) {
+        waitForActiveAjaxRequestComplete();
+        waitForActiveAnimationsComplete();
         assertTrue("Page source should contains the text.",
                 browser.base().getPageSource().contains(
                         Resources.base().string(text, text)));

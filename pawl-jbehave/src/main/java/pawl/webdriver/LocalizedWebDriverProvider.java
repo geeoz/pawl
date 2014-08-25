@@ -63,7 +63,10 @@ public class LocalizedWebDriverProvider extends PropertyWebDriverProvider {
         desiredCapabilities.setCapability(
                 "phantomjs.page.customHeaders.Accept-Language",
                 getSystemLanguage());
-        return new PhantomJSDriver(desiredCapabilities);
+        PhantomJSDriver phantomJSDriver = new PhantomJSDriver(
+                desiredCapabilities);
+        phantomJSDriver.manage().window().maximize();
+        return phantomJSDriver;
     }
 
     /**

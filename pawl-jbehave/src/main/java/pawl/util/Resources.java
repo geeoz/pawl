@@ -198,7 +198,12 @@ public final class Resources {
      * @return quantity of threads for tests execution
      */
     public int useThreads() {
-        return Runtime.getRuntime().availableProcessors();
+        if (System.getProperty("browser").equals("phantomjs")) {
+            return 1;
+            //because of bug https://github.com/detro/ghostdriver/issues/170
+        } else {
+            return Runtime.getRuntime().availableProcessors();
+        }
     }
 
     /**
