@@ -37,8 +37,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * @author Alex Voloshyn
  * @author Mike Dolinin
- * @version 1.0 7/22/2014
+ * @version 1.1 8/28/14
  */
 public class IsReceivedEmailWithSubject extends TypeSafeMatcher<GreenMail> {
     /**
@@ -129,7 +130,11 @@ public class IsReceivedEmailWithSubject extends TypeSafeMatcher<GreenMail> {
      * Wait until received message with subject.
      */
     private void waitUntilReceivedMessageWithSubject() {
-        doWait().until(new Predicate<GreenMail>() {
+        final FluentWait<GreenMail> wait = new FluentWait<>(greenMail)
+                .withTimeout(Resources.base().explicitWait(), TimeUnit.SECONDS)
+                .pollingEvery(Resources.base().pollingInterval(),
+                        TimeUnit.MILLISECONDS);
+        wait.until(new Predicate<GreenMail>() {
             @Override
             public boolean apply(final GreenMail input) {
                 messages = greenMail.getReceivedMessages();
@@ -144,17 +149,5 @@ public class IsReceivedEmailWithSubject extends TypeSafeMatcher<GreenMail> {
                 return false;
             }
         });
-    }
-
-    /**
-     * Create fluent wait for email with time out and polling interval.
-     *
-     * @return fluent wait
-     */
-    private FluentWait doWait() {
-        return new FluentWait(greenMail)
-                .withTimeout(Resources.base().explicitWait(), TimeUnit.SECONDS)
-                .pollingEvery(Resources.base().pollingInterval(),
-                        TimeUnit.MILLISECONDS);
     }
 }

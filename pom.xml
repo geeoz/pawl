@@ -57,8 +57,8 @@
 
     <properties>
         <main.basedir>${project.basedir}</main.basedir>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <proxy.args />
@@ -79,10 +79,10 @@
         <maven-surefire-plugin.version>2.15</maven-surefire-plugin.version>
         <!-- Code quality check maven plugin versions -->
         <maven-checkstyle-plugin.version>2.10</maven-checkstyle-plugin.version>
-        <findbugs-maven-plugin.version>2.5.3</findbugs-maven-plugin.version>
+        <findbugs-maven-plugin.version>3.0.0</findbugs-maven-plugin.version>
         <findbugs-annotations.version>1.0.0</findbugs-annotations.version>
         <maven-jxr-plugin.version>2.3</maven-jxr-plugin.version>
-        <maven-pmd-plugin.version>3.0.1</maven-pmd-plugin.version>
+        <maven-pmd-plugin.version>3.2</maven-pmd-plugin.version>
         <!-- Functional check maven plugin versions -->
         <maven-failsafe-plugin.version>2.16</maven-failsafe-plugin.version>
         <!-- Distribution sign -->

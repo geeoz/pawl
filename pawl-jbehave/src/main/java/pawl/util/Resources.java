@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  * Resources contain objects from different areas. When your program needs
  * a resource, a <code>String</code> for example, your program can load it
  * from the system properties or specified resource bundle.
- * <p/>
+ * <p>
  * When your program needs an object, it loads the <code>Resources</code>
  * class using the {@link #get(String) get(String)}
  * method:
@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  *
  * @author Alex Voloshyn
  * @author Mike Dolinin
- * @version 1.6 2/28/14
+ * @version 1.7 8/28/14
  * @see ResourceBundle
  */
 public final class Resources {
@@ -70,7 +70,6 @@ public final class Resources {
      */
     private static final ThreadLocal<Map<String, String>> CONTEXT =
             new ThreadLocal<>();
-
     /**
      * Resource bundle.
      */
@@ -126,15 +125,6 @@ public final class Resources {
             CONTEXT.set(Maps.<String, String>newConcurrentMap());
         }
         return CONTEXT.get();
-    }
-
-    /**
-     * Get resources for the 'base-default' base name.
-     *
-     * @return a resources for the 'base-default' base name
-     */
-    private static Resources system() {
-        return get(SYSTEM_BASE_NAME);
     }
 
     /**
@@ -268,7 +258,7 @@ public final class Resources {
         }
 
         if (result == null && !isSystem) {
-            result = system().string(key, true);
+            result = get(SYSTEM_BASE_NAME).string(key, true);
         }
 
         return result;
