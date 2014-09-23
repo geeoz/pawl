@@ -188,7 +188,7 @@ public final class Resources {
      * @return quantity of threads for tests execution
      */
     public int useThreads() {
-        if (System.getProperty("browser").equals("phantomjs")) {
+        if (System.getProperty("browser", "firefox").equals("phantomjs")) {
             return 1;
             //because of bug https://github.com/detro/ghostdriver/issues/170
         } else {

@@ -119,6 +119,10 @@ public final class WebExpectedConditions {
          * Handle js function for counter check.
          */
         private final String counterJsFunction;
+        /**
+         * Handle counter.
+         */
+        private Long counter;
 
         /**
          * Create an object expected conditions for counter.
@@ -139,16 +143,22 @@ public final class WebExpectedConditions {
             if (driver == null) {
                 throw new WebDriverException();
             }
-            long counter;
             try {
 
                 counter = (Long) ((JavascriptExecutor) driver)
                         .executeScript("return " + counterJsFunction + ";",
                                 new Object[]{});
             } catch (WebDriverException e) {
-                counter = 0;
+                counter = (long) 0;
             }
             return counter == 0;
+        }
+
+        @Override
+        public String toString() {
+            return "CounterExpectedCondition{"
+                    + "counterJsFunction='" + counterJsFunction + '\''
+                    + ", counter=" + counter + '}';
         }
     }
 }

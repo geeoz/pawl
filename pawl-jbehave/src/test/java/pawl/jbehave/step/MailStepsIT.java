@@ -60,16 +60,18 @@ public class MailStepsIT {
      * Verify that THEN step verify last email subject.
      */
     @Test
-    public void shouldCheckLastEmailSubject() {
+    public void shouldCheckAllEmails() {
         final MailSteps steps = new MailSteps();
         steps.startEmailTestServer();
         final GreenMail greenMail = steps.getGreenMail();
         try {
             GreenMailUtil.sendTextEmailTest(
-                    "to@localhost.com", "from@localhost.com", "subject1", "body");
+                    "ex@localhost.com", "from@localhost.com", "subject1", "body");
             GreenMailUtil.sendTextEmailTest(
                     "to@localhost.com", "from@localhost.com", "subject2", "body");
-            steps.verifyLastEmailSubject("subject2");
+            GreenMailUtil.sendTextEmailTest(
+                    "to@localhost.com", "from@localhost.com", "subject3", "body");
+            steps.verifyLastEmailSubject("to@localhost.com", "subject2");
         } finally {
             greenMail.stop();
         }
@@ -86,23 +88,20 @@ public class MailStepsIT {
         steps.startEmailTestServer();
         final GreenMail greenMail = steps.getGreenMail();
         try {
-            Runnable sendEmailAfterFewSeconds = new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.currentThread().sleep(
-                                Resources.base().pollingInterval() - 100);
-                        GreenMailUtil.sendTextEmailTest(
-                                "to@localhost.com",
-                                "from@localhost.com", "subject4", "body");
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            Runnable sendEmailAfterFewSeconds = () -> {
+                try {
+                    Thread.currentThread().sleep(
+                            Resources.base().pollingInterval() - 100);
+                    GreenMailUtil.sendTextEmailTest(
+                            "to@localhost.com",
+                            "from@localhost.com", "subject4", "body");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             };
             Thread t = new Thread(sendEmailAfterFewSeconds);
             t.start();
-            steps.verifyLastEmailSubject("subject4");
+            steps.verifyLastEmailSubject("to@localhost.com", "subject4");
         } finally {
             greenMail.stop();
         }
@@ -122,7 +121,7 @@ public class MailStepsIT {
                     "to@localhost.com", "from@localhost.com", "темма", "body");
             GreenMailUtil.sendTextEmailTest(
                     "to@localhost.com", "from@localhost.com", "тема2", "body");
-            steps.verifyLastEmailSubject("тема2");
+            steps.verifyLastEmailSubject("to@localhost.com", "тема2");
         } finally {
             greenMail.stop();
         }
@@ -143,7 +142,7 @@ public class MailStepsIT {
 
             assertThat("Values should be empty.",
                     Resources.context().get("key"), is(nullValue()));
-
+            steps.verifyLastEmailSubject("to@localhost.com", "subject");
             steps.storeLinkFromElement("id", "key");
             assertThat("Values should be the same.",
                     Resources.context().get("key"),
@@ -151,8 +150,9 @@ public class MailStepsIT {
 
             Resources.context().put("key", "123");
             GreenMailUtil.sendTextEmailTest(
-                    "to@localhost.com", "from@localhost.com", "subject",
+                    "to2@localhost.com", "from@localhost.com", "subject2",
                     "body with <a id='id' href='http://localhost'/>");
+            steps.verifyLastEmailSubject("to2@localhost.com", "subject2");
             steps.storeLinkFromElement("id", "key");
             assertThat("Values should be the same.",
                     Resources.context().get("key"),

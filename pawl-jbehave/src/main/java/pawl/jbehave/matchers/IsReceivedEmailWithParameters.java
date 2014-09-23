@@ -28,6 +28,8 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.support.ui.FluentWait;
 import pawl.util.Resources;
 
+import javax.mail.Address;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.Arrays;
@@ -41,12 +43,16 @@ import java.util.logging.Logger;
  * @author Mike Dolinin
  * @version 1.1 8/28/14
  */
-public class IsReceivedEmailWithSubject extends TypeSafeMatcher<GreenMail> {
+public class IsReceivedEmailWithParameters extends TypeSafeMatcher<GreenMail> {
     /**
      * Default logger.
      */
     private static final Logger LOG =
-            Logger.getLogger(IsReceivedEmailWithSubject.class.getName());
+            Logger.getLogger(IsReceivedEmailWithParameters.class.getName());
+    /**
+     * Recipient email to match.
+     */
+    private String to;
     /**
      * Subject to match.
      */
@@ -61,43 +67,44 @@ public class IsReceivedEmailWithSubject extends TypeSafeMatcher<GreenMail> {
     private MimeMessage[] messages;
 
     /**
-     * Create matcher that poll new message until find subject.
+     * Create matcher that poll new message until find.
      *
-     * @param subjectToMatch string
+     * @param recipientEmailToMatch string
+     * @param subjectToMatch        string
      */
-    public IsReceivedEmailWithSubject(final String subjectToMatch) {
+    public IsReceivedEmailWithParameters(final String recipientEmailToMatch,
+                                         final String subjectToMatch) {
+        this.to = recipientEmailToMatch;
         this.subject = subjectToMatch;
     }
 
     @Override
     public void describeTo(final Description description) {
-        description.appendText("received message with subject - " + subject);
+        description.appendText("received message with parameters: "
+                + "recipient - " + to
+                + ", subject - " + subject);
     }
 
     @Override
     protected void describeMismatchSafely(
             final GreenMail item, final Description mismatchDescription) {
-        List<String> subjectsList = Lists.transform(
-                Arrays.asList(messages), toSubjects);
+        List<String> recipientsAndSubjectsList = Lists.transform(
+                Arrays.asList(messages), toRecipientsAndSubjects);
         mismatchDescription.appendText("was ");
-        mismatchDescription.appendValueList("", ", ", "", subjectsList);
+        mismatchDescription.appendValueList("", ", ", "",
+                recipientsAndSubjectsList);
     }
 
     /**
      * Function to get subjects from MIME messages.
      */
-    private static Function<MimeMessage, String> toSubjects =
+    private Function<MimeMessage, String> toRecipientsAndSubjects =
             new Function<MimeMessage, String>() {
                 @Override
                 public String apply(final MimeMessage input) {
-                    if (input == null) {
-                        return "";
-                    }
-                    try {
-                        return input.getSubject();
-                    } catch (MessagingException e) {
-                        return "";
-                    }
+                    return "recipient - " + getRecipients(input)
+                            + ", subject - "
+                            + getSubject(input);
                 }
             };
 
@@ -117,13 +124,15 @@ public class IsReceivedEmailWithSubject extends TypeSafeMatcher<GreenMail> {
      * Factory that create new received email with subject matcher.
      *
      * @param <T>     mail server type
+     * @param recipientEmail string
      * @param subject string
      * @return new matcher
      */
     @Factory
-    public static <T> Matcher<GreenMail> receivedEmailWithSubject(
+    public static <T> Matcher<GreenMail> receivedEmailWithParameters(
+            final String recipientEmail,
             final String subject) {
-        return new IsReceivedEmailWithSubject(subject);
+        return new IsReceivedEmailWithParameters(recipientEmail, subject);
     }
 
     /**
@@ -138,16 +147,45 @@ public class IsReceivedEmailWithSubject extends TypeSafeMatcher<GreenMail> {
             @Override
             public boolean apply(final GreenMail input) {
                 messages = greenMail.getReceivedMessages();
-                if (messages.length > 0) {
-                    try {
-                        return messages[messages.length - 1]
-                                .getSubject().equals(subject);
-                    } catch (MessagingException e) {
-                        LOG.log(Level.FINE, e.getMessage(), e.getCause());
+                for (MimeMessage mimeMessage : messages) {
+                    for (Address address : getRecipients(mimeMessage)) {
+                        if (address.toString().equals(to)
+                                && getSubject(mimeMessage).equals(subject)) {
+                            return true;
+                        }
                     }
                 }
                 return false;
             }
         });
     }
+
+    /**
+     * Get recipients type to from message.
+     * @param msg message
+     * @return list of recipients addresses
+     */
+    private List<Address> getRecipients(final MimeMessage msg) {
+        try {
+            return Arrays.asList(msg.getRecipients(Message.RecipientType.TO));
+        } catch (MessagingException e) {
+            LOG.log(Level.FINE, e.getMessage(), e.getCause());
+            return Arrays.asList(new Address[]{});
+        }
+    }
+
+    /**
+     * Get subject from message.
+     * @param msg message
+     * @return message subject
+     */
+    private String getSubject(final MimeMessage msg) {
+        try {
+            return msg.getSubject();
+        } catch (MessagingException e) {
+            LOG.log(Level.FINE, e.getMessage(), e.getCause());
+            return "";
+        }
+    }
+
 }

@@ -28,11 +28,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import pawl.util.Resources;
 
+import javax.mail.Address;
+import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static pawl.jbehave.matchers.IsReceivedEmailWithSubject.
-        receivedEmailWithSubject;
+import static pawl.jbehave.matchers.IsReceivedEmailWithParameters
+        .receivedEmailWithParameters;
 
 /**
  * <code>MailSteps</code> a simple POJO, which will contain the Java methods
@@ -44,6 +47,10 @@ import static pawl.jbehave.matchers.IsReceivedEmailWithSubject.
  * @version 1.0 2/27/14
  */
 public final class MailSteps extends Matchers {
+    /**
+     * Key name to store found email body in context.
+     */
+    public static final String FOUND_EMAIL_BODY = "found email body";
     /**
      * An instance of the green mail server.
      */
@@ -61,15 +68,22 @@ public final class MailSteps extends Matchers {
     }
 
     /**
-     * Verify last email subject.
+     * Verify received email with parameters.
      *
-     * @param subject last mail message subject
+     * @param recipient mail message subject
+     * @param subject   last mail message subject
      */
-    @Then("I get email with '$subject' subject")
-    @Alias("email with '$subject' subject")
-    public void verifyLastEmailSubject(final String subject) {
+    @Then("I get email with parameters '$recipient' and '$subject'")
+    @Alias("mail with parameters '$recipient' and '$subject'")
+    public void verifyLastEmailSubject(final String recipient,
+                                       final String subject) {
+        String toValue = Resources.base().string(recipient, recipient);
         String subjectValue = Resources.base().string(subject, subject);
-        assertThat(greenMail, is(receivedEmailWithSubject(subjectValue)));
+        assertThat(greenMail, is(receivedEmailWithParameters(toValue,
+                subjectValue)));
+        MimeMessage message = findMessageWithParameters(toValue, subjectValue);
+        final String body = GreenMailUtil.getBody(message);
+        Resources.context().put(FOUND_EMAIL_BODY, body);
     }
 
     /**
@@ -81,12 +95,46 @@ public final class MailSteps extends Matchers {
      */
     @When("I remember email link from '$identity' to '$key' variable")
     public void storeLinkFromElement(final String identity, final String key) {
-        final MimeMessage[] messages = greenMail.getReceivedMessages();
-        final String body =
-                GreenMailUtil.getBody(messages[messages.length - 1]);
+        String body = Resources.context().get(FOUND_EMAIL_BODY);
         final Document html = Jsoup.parse(body);
         final Element link = html.getElementById(identity);
         Resources.context().put(key, link.attr("href"));
+    }
+
+    /**
+     * Find received email with parameters.
+     *
+     * @param recipient mail message subject
+     * @param subject   last mail message subject
+     * @return message with parameters
+     */
+    private MimeMessage findMessageWithParameters(final String recipient,
+                                                  final String subject) {
+        StringBuilder recipientsAndSubjects = new StringBuilder();
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        for (MimeMessage mimeMessage : receivedMessages) {
+            try {
+                for (Address address : mimeMessage.getRecipients(
+                        Message.RecipientType.TO)) {
+                    String addressString = address.toString();
+                    String subjectString = mimeMessage.getSubject();
+                    recipientsAndSubjects.append("\nrecipient - ");
+                    recipientsAndSubjects.append(addressString);
+                    recipientsAndSubjects.append(", subject - ");
+                    recipientsAndSubjects.append(subjectString);
+                    if (addressString.equals(recipient)
+                            && subjectString.equals(subject)) {
+                        return mimeMessage;
+                    }
+                }
+            } catch (MessagingException e) {
+                continue;
+            }
+        }
+        throw new AssertionError("Could not find message with parameters: "
+                + "recipient - " + recipient + ", subject - " + subject
+                + "\nin mailbox with : "
+                + recipientsAndSubjects.toString());
     }
 
     /**
