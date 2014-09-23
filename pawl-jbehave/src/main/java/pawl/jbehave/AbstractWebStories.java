@@ -52,7 +52,6 @@ import static org.jbehave.core.reporters.Format.TXT;
  * @see pawl.jbehave.step.BrowserSteps#openUrl()
  * @see pawl.jbehave.step.BrowserSteps#openContextPath(String)
  * @see pawl.jbehave.step.BrowserSteps#refreshPage()
- * @see pawl.jbehave.step.BrowserSteps#wait(String)
  * @see pawl.jbehave.step.BrowserSteps#choose(String, String, String)
  * @see pawl.jbehave.step.BrowserSteps#click(String)
  * @see pawl.jbehave.step.BrowserSteps#clickWithOffset(String, String, String)
