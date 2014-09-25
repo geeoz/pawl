@@ -197,6 +197,15 @@ public final class Resources {
     }
 
     /**
+     * Return value for wait all stories executed.
+     *
+     * @return wait time
+     */
+    public long useStoryTimeoutInSecs() {
+        return Long.parseLong(string("story.timeout.in.secs"));
+    }
+
+    /**
      * Return web stories for run.
      *
      * @return path patters for story paths

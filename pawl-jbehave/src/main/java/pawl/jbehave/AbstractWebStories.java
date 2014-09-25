@@ -91,6 +91,8 @@ public abstract class AbstractWebStories extends JUnitStories {
         super();
         configuredEmbedder().embedderControls()
                 .useThreads(Resources.base().useThreads())
+                .useStoryTimeoutInSecs(
+                        Resources.base().useStoryTimeoutInSecs())
                 .doIgnoreFailureInStories(true)
                 .doBatch(true);
     }
