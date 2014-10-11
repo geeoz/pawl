@@ -27,6 +27,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import pawl.jbehave.Pages;
@@ -55,7 +56,7 @@ import static org.junit.Assert.fail;
  * @author Alex Voloshyn
  * @author Mike Dolinin
  * @author Serge Voloshyn
- * @version 1.14 2/27/14
+ * @version 1.15 10/11/14
  */
 public final class BrowserSteps extends Matchers {
     /**
@@ -122,17 +123,6 @@ public final class BrowserSteps extends Matchers {
     public void openContextPath(final String contextPath) {
         String currentUrl = browser.base().getCurrentUrl();
         browser.base().get(currentUrl + contextPath);
-    }
-
-    /**
-     * Action to wait with timeout for all ajax responses.
-     */
-    private void waitForActiveAjaxRequestComplete() {
-        final WebDriverWait wait =
-                new WebDriverWait(browser.base(),
-                        Resources.base().explicitWait());
-        wait.until(WebExpectedConditions.get()
-                .complete("activeAjaxRequests()"));
     }
 
     /**
@@ -248,7 +238,6 @@ public final class BrowserSteps extends Matchers {
      * @return a web elements that was found
      */
     private List<WebElement> getVisibleElements(final String identity) {
-        waitForActiveAjaxRequestComplete();
         waitForActiveAnimationsComplete();
         By[] selectors = {
                 By.id(identity),
@@ -301,7 +290,6 @@ public final class BrowserSteps extends Matchers {
      */
     @When("I click on link '$href'")
     public void clickOnLinkWithAttribute(final String href) {
-        waitForActiveAjaxRequestComplete();
         waitForActiveAnimationsComplete();
         browser.base().findElement(
                 By.xpath(".//a[@href='" + href + "']")).click();
@@ -369,11 +357,12 @@ public final class BrowserSteps extends Matchers {
      */
     @Then("I get title '$title'")
     public void verifyTitle(final String title) {
-        waitForActiveAjaxRequestComplete();
         waitForActiveAnimationsComplete();
-        assertThat("The page title should be as follow.",
-                browser.base().getTitle(),
-                equalTo(Resources.base().string(title, title)));
+        final WebDriverWait wait =
+                new WebDriverWait(browser.base(),
+                        Resources.base().explicitWait());
+        wait.until(ExpectedConditions
+                .titleIs(Resources.base().string(title, title)));
     }
 
     /**
@@ -384,7 +373,6 @@ public final class BrowserSteps extends Matchers {
     @Then("I get text '$text'")
     @Alias("text '$text'")
     public void verifySource(final String text) {
-        waitForActiveAjaxRequestComplete();
         waitForActiveAnimationsComplete();
         assertTrue("Page source should contains the text.",
                 browser.base().getPageSource().contains(
