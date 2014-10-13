@@ -191,7 +191,14 @@ public final class Resources {
             return 1;
             //because of bug https://github.com/detro/ghostdriver/issues/170
         } else {
-            return Runtime.getRuntime().availableProcessors();
+            int processors = Runtime.getRuntime().availableProcessors();
+            int threads = Integer.parseInt(
+                    string("use.threads", String.valueOf(processors)));
+            if (threads < processors) {
+                return threads;
+            } else {
+                return processors;
+            }
         }
     }
 
