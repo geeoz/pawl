@@ -22,11 +22,11 @@ import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 import org.openqa.selenium.By;
-import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import pawl.jbehave.Pages;
@@ -35,10 +35,8 @@ import pawl.util.WebExpectedConditions;
 
 import java.net.URL;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -55,7 +53,7 @@ import static org.junit.Assert.fail;
  * @author Alex Voloshyn
  * @author Mike Dolinin
  * @author Serge Voloshyn
- * @version 1.14 2/27/14
+ * @version 1.15 10/11/14
  */
 public final class BrowserSteps extends Matchers {
     /**
@@ -125,25 +123,21 @@ public final class BrowserSteps extends Matchers {
     }
 
     /**
-     * Action to wait with timeout for all ajax responses.
-     */
-    private void waitForActiveAjaxRequestComplete() {
-        final WebDriverWait wait =
-                new WebDriverWait(browser.base(),
-                        Resources.base().explicitWait());
-        wait.until(WebExpectedConditions.get()
-                .complete("activeAjaxRequests()"));
-    }
-
-    /**
      * Action to wait with timeout for all animations complete.
      */
     private void waitForActiveAnimationsComplete() {
-        final WebDriverWait wait =
-                new WebDriverWait(browser.base(),
-                        Resources.base().explicitWait());
-        wait.until(WebExpectedConditions.get()
+        getWait().until(WebExpectedConditions.get()
                 .complete("activeAnimations()"));
+    }
+
+    /**
+     * Creates new wait with timeout from properties.
+     *
+     * @return wait
+     */
+    public WebDriverWait getWait() {
+        return new WebDriverWait(browser.base(),
+                Resources.base().explicitWait());
     }
 
     /**
@@ -194,7 +188,7 @@ public final class BrowserSteps extends Matchers {
         final List<WebElement> elements
                 = parent.findElements(By.className(className));
         assertThat("Page elements should exists: class name '" + className
-                + "'", elements.size(),
+                        + "'", elements.size(),
                 is(not(equalTo(0))));
 
         for (final WebElement element : elements) {
@@ -248,40 +242,27 @@ public final class BrowserSteps extends Matchers {
      * @return a web elements that was found
      */
     private List<WebElement> getVisibleElements(final String identity) {
-        waitForActiveAjaxRequestComplete();
         waitForActiveAnimationsComplete();
-        By[] selectors = {
-                By.id(identity),
-                By.xpath(Resources.base().identityXpath(identity)),
-                By.name(identity),
-                By.className(identity),
-                By.cssSelector(identity),
-                By.xpath(identity)};
-        if (identity.matches("^[0-9]")) {
-            selectors = new By[]{
-                    By.id(identity),
-                    By.name(identity)};
-            LOG.fine("Identity starts with numbers it could be only "
-                    + "id or name.");
+        By locator = parseBy(identity);
+        getWait().until(ExpectedConditions
+                .visibilityOfAllElementsLocatedBy(locator));
+        return browser.base().findElements(locator);
+    }
+
+    /**
+     * Covert user string to By objects.
+     *
+     * @param identity an identity of the element
+     * @return By selector
+     */
+    private By parseBy(final String identity) {
+        By selector = new By.ById(identity);
+        if (identity.startsWith("/")) {
+            selector = new By.ByXPath(identity);
+        } else if (identity.startsWith("#") || identity.startsWith(".")) {
+            selector = new By.ByCssSelector(identity);
         }
-        for (By selector : selectors) {
-            List<WebElement> elements = browser.base().findElements(selector);
-            if (!elements.isEmpty()) {
-                List<WebElement> visibleElements = new ArrayList<>(
-                        elements.size());
-                for (WebElement element : elements) {
-                    if (element.isDisplayed()) {
-                        visibleElements.add(element);
-                    }
-                }
-                if (!visibleElements.isEmpty()) {
-                    return visibleElements;
-                }
-            }
-        }
-        throw new NoSuchElementException(
-                "Could not find any visible element with identity - "
-                        + identity);
+        return selector;
     }
 
     /**
@@ -301,7 +282,6 @@ public final class BrowserSteps extends Matchers {
      */
     @When("I click on link '$href'")
     public void clickOnLinkWithAttribute(final String href) {
-        waitForActiveAjaxRequestComplete();
         waitForActiveAnimationsComplete();
         browser.base().findElement(
                 By.xpath(".//a[@href='" + href + "']")).click();
@@ -369,11 +349,9 @@ public final class BrowserSteps extends Matchers {
      */
     @Then("I get title '$title'")
     public void verifyTitle(final String title) {
-        waitForActiveAjaxRequestComplete();
         waitForActiveAnimationsComplete();
-        assertThat("The page title should be as follow.",
-                browser.base().getTitle(),
-                equalTo(Resources.base().string(title, title)));
+        getWait().until(ExpectedConditions
+                .titleIs(Resources.base().string(title, title)));
     }
 
     /**
@@ -384,7 +362,6 @@ public final class BrowserSteps extends Matchers {
     @Then("I get text '$text'")
     @Alias("text '$text'")
     public void verifySource(final String text) {
-        waitForActiveAjaxRequestComplete();
         waitForActiveAnimationsComplete();
         assertTrue("Page source should contains the text.",
                 browser.base().getPageSource().contains(
@@ -413,12 +390,9 @@ public final class BrowserSteps extends Matchers {
     @Then("I get no '$identity' element")
     @Alias("no '$elementId' element")
     public void verifyElementIsNotPresent(final String identity) {
-        try {
-            assertThat("Page element should not exists: '" + identity,
-                    getVisibleElements(identity).size(), is(equalTo(0)));
-        } catch (NoSuchElementException | InvalidSelectorException e) {
-            LOG.fine(e.getMessage());
-        }
+        waitForActiveAnimationsComplete();
+        getWait().until(ExpectedConditions.invisibilityOfElementLocated(
+                parseBy(identity)));
     }
 
     /**
@@ -449,7 +423,8 @@ public final class BrowserSteps extends Matchers {
                 element, is(notNullValue()));
         final String value = Resources.base().string(text, text);
         assertThat(String.format(
-                "Page element '%s' should have text: '%s'", identity, value),
+                        "Page element '%s' should have text: '%s'",
+                        identity, value),
                 getTextFrom(element),
                 is(equalTo(getTextFromStorageIfExist(value))));
     }

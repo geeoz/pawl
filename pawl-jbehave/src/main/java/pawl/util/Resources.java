@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  *
  * @author Alex Voloshyn
  * @author Mike Dolinin
- * @version 1.7 8/28/14
+ * @version 1.8 10/11/14
  * @see ResourceBundle
  */
 public final class Resources {
@@ -128,16 +128,6 @@ public final class Resources {
     }
 
     /**
-     * Retrieves XPath for element identification.
-     *
-     * @param identity the value of the element identity
-     * @return XPath for element identification
-     */
-    public String identityXpath(final String identity) {
-        return String.format(string("xpath.identity"), identity);
-    }
-
-    /**
      * Return value for wait after page open key.
      *
      * @return wait time
@@ -162,6 +152,15 @@ public final class Resources {
      */
     public String userSessionCookieName() {
         return string("user.session.cookie.name");
+    }
+
+    /**
+     * Return log level for web-driver.
+     *
+     * @return log level
+     */
+    public String webDriverLogLevel() {
+        return string("webdriver.loglevel", "INFO");
     }
 
     /**

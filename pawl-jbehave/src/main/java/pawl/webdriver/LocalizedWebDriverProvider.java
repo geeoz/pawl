@@ -21,7 +21,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import pawl.util.Resources;
 
 import java.util.Locale;
 
@@ -29,7 +31,7 @@ import java.util.Locale;
  * Provide localization support for different browsers.
  *
  * @author Mike Dolinin
- * @version 1.0 2/26/14
+ * @version 1.1 10/11/14
  */
 public class LocalizedWebDriverProvider extends PropertyWebDriverProvider {
     /**
@@ -50,7 +52,9 @@ public class LocalizedWebDriverProvider extends PropertyWebDriverProvider {
         FirefoxProfile firefoxProfile = new FirefoxProfile();
         firefoxProfile.setPreference("intl.accept_languages",
                 getSystemLanguage());
-        return new FirefoxDriver(firefoxProfile);
+        FirefoxDriver firefoxDriver = new FirefoxDriver(firefoxProfile);
+        firefoxDriver.manage().window().maximize();
+        return firefoxDriver;
     }
 
     /**
@@ -60,6 +64,13 @@ public class LocalizedWebDriverProvider extends PropertyWebDriverProvider {
      */
     protected WebDriver createPhantomJSDriver() {
         DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+        String[] phantomArgs = new String[]{
+                "--webdriver-loglevel="
+                        + Resources.base().webDriverLogLevel()
+        };
+        desiredCapabilities
+                .setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS,
+                        phantomArgs);
         desiredCapabilities.setCapability(
                 "phantomjs.page.customHeaders.Accept-Language",
                 getSystemLanguage());
