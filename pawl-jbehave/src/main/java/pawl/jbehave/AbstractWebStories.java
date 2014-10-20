@@ -18,8 +18,7 @@ package pawl.jbehave;
 
 import org.jbehave.core.configuration.Configuration;
 import org.jbehave.core.io.LoadFromClasspath;
-import org.jbehave.core.io.StoryFinder;
-import org.jbehave.core.junit.JUnitStories;
+import org.jbehave.core.junit.JUnitStory;
 import org.jbehave.core.reporters.StoryReporterBuilder;
 import org.jbehave.core.steps.InjectableStepsFactory;
 import org.jbehave.core.steps.InstanceStepsFactory;
@@ -29,13 +28,14 @@ import org.jbehave.web.selenium.SeleniumContext;
 import org.jbehave.web.selenium.WebDriverProvider;
 import org.jbehave.web.selenium.WebDriverScreenshotOnFailure;
 import org.jbehave.web.selenium.WebDriverSteps;
+import pawl.jbehave.step.BrowserSteps;
+import pawl.jbehave.step.MailSteps;
 import pawl.util.Resources;
 import pawl.webdriver.LocalizedWebDriverProvider;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import static java.util.Arrays.asList;
-import static org.jbehave.core.io.CodeLocations.codeLocationFromClass;
 import static org.jbehave.core.reporters.Format.CONSOLE;
 import static org.jbehave.core.reporters.Format.TXT;
 
@@ -68,7 +68,7 @@ import static org.jbehave.core.reporters.Format.TXT;
  * @see pawl.jbehave.step.BrowserSteps#verifyElementText(String, String)
  * @see pawl.jbehave.step.BrowserSteps#verifyElementIsNotPresent(String)
  */
-public abstract class AbstractWebStories extends JUnitStories {
+public abstract class AbstractWebStories extends JUnitStory {
     /**
      * JBehave web driver provider.
      */
@@ -83,6 +83,11 @@ public abstract class AbstractWebStories extends JUnitStories {
      * Web testing context.
      */
     private final transient SeleniumContext context = new SeleniumContext();
+
+    /**
+     * Web pages collection factory.
+     */
+    private final transient Pages pages = new Pages(getDriverProvider());
 
     /**
      * JBehave user story launcher.
@@ -109,7 +114,8 @@ public abstract class AbstractWebStories extends JUnitStories {
                         // CONSOLE and TXT reporting
                 .useStoryReporterBuilder(
                         new StoryReporterBuilder().withDefaultFormats()
-                                .withFormats(CONSOLE, TXT));
+                                .withFormats(CONSOLE, TXT))
+                .useStoryPathResolver(new UnderscoredCamelCaseITResolver());
     }
 
     // Here we specify the steps classes
@@ -123,27 +129,6 @@ public abstract class AbstractWebStories extends JUnitStories {
         return new InstanceStepsFactory(configuration(), steps);
     }
 
-    @Override
-    protected final List<String> storyPaths() {
-        // Specify story paths as URLs
-        final String file = codeLocationFromClass(this.getClass()).getFile();
-        return new StoryFinder().findPaths(file,
-                asList(getStoriesToRun()), asList(""));
-    }
-
-    /**
-     * Path pattern for user stories.
-     *
-     * @return path pattern for user stories.
-     */
-    private String getStoriesToRun() {
-        String result = storiesToRun();
-        if (result == null) {
-            result = Resources.base().webStoriesToRun();
-        }
-        return result;
-    }
-
     /**
      * Gets current web driver provider.
      *
@@ -154,16 +139,14 @@ public abstract class AbstractWebStories extends JUnitStories {
     }
 
     /**
-     * Gets stories for run.
-     *
-     * @return path patters for story paths
-     */
-    protected abstract String storiesToRun();
-
-    /**
      * Gets steps for include.
      *
      * @return steps instances
      */
-    protected abstract List<Object> stepsInstances();
+    private List<Object> stepsInstances() {
+        final List<Object> list = new LinkedList<>();
+        list.add(new BrowserSteps(pages));
+        list.add(new MailSteps());
+        return list;
+    }
 }

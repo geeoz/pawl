@@ -53,6 +53,7 @@
 
     <modules>
         <module>pawl-jbehave</module>
+        <module>pawl-jbehave-maven-plugin</module>
     </modules>
 
     <properties>

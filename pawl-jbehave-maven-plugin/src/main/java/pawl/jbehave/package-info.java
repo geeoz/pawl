@@ -15,6 +15,6 @@
  */
 
 /**
- * Testing matcher's.
+ * Maven plugins for pawl and jbehave.
  */
-package pawl.jbehave.matchers;
+package pawl.jbehave;

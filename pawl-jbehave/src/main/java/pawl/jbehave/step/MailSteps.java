@@ -16,9 +16,10 @@
 
 package pawl.jbehave.step;
 
+import com.google.common.base.Predicate;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
-import org.hamcrest.Matchers;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import org.jbehave.core.annotations.Alias;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
@@ -26,16 +27,22 @@ import org.jbehave.core.annotations.When;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.support.ui.FluentWait;
 import pawl.util.Resources;
 
 import javax.mail.Address;
+import javax.mail.AuthenticationFailedException;
+import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.URLName;
 import javax.mail.internet.MimeMessage;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static pawl.jbehave.matchers.IsReceivedEmailWithParameters
-        .receivedEmailWithParameters;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  * <code>MailSteps</code> a simple POJO, which will contain the Java methods
@@ -46,7 +53,12 @@ import static pawl.jbehave.matchers.IsReceivedEmailWithParameters
  * @author Alex Voloshyn
  * @version 1.0 2/27/14
  */
-public final class MailSteps extends Matchers {
+public final class MailSteps {
+    /**
+     * Default logger.
+     */
+    private static final Logger LOG =
+            Logger.getLogger(MailSteps.class.getName());
     /**
      * Key name to store found email body in context.
      */
@@ -55,15 +67,37 @@ public final class MailSteps extends Matchers {
      * An instance of the green mail server.
      */
     private transient GreenMail greenMail = null;
+    /**
+     * An instance of the mail store.
+     */
+    private Store store;
+    /**
+     * An instance of the inbox mail.
+     */
+    private Folder inbox;
+    /**
+     * All recipients and subjects in inbox.
+     */
+    private StringBuilder recipientsAndSubjects;
 
     /**
      * Start Email Test Server.
      */
     @Given("an email test server")
     public void startEmailTestServer() {
-        if (greenMail == null) {
-            greenMail = new GreenMail(); //uses test ports by default
-            greenMail.start();
+        try {
+            if (greenMail == null) {
+                greenMail = new GreenMail(ServerSetupTest.SMTP_POP3);
+                Thread.UncaughtExceptionHandler silentHandler =
+                        new SilentExceptionHandler();
+                greenMail.getSmtp().setUncaughtExceptionHandler(silentHandler);
+                greenMail.getPop3().setUncaughtExceptionHandler(silentHandler);
+                //uses test ports by default
+                greenMail.start();
+            }
+        } catch (RuntimeException e) {
+            LOG.fine("Email server is already started");
+            // hope email server is running
         }
     }
 
@@ -77,13 +111,14 @@ public final class MailSteps extends Matchers {
     @Alias("mail with parameters '$recipient' and '$subject'")
     public void verifyLastEmailSubject(final String recipient,
                                        final String subject) {
-        String toValue = Resources.base().string(recipient, recipient);
+        String recipientValue = Resources.base().string(recipient, recipient);
         String subjectValue = Resources.base().string(subject, subject);
-        assertThat(greenMail, is(receivedEmailWithParameters(toValue,
-                subjectValue)));
-        MimeMessage message = findMessageWithParameters(toValue, subjectValue);
+        waitUntilReceivedMessageWithParameters(recipientValue, subjectValue);
+        MimeMessage message = findMessageWithParams(recipientValue,
+                subjectValue);
         final String body = GreenMailUtil.getBody(message);
         Resources.context().put(FOUND_EMAIL_BODY, body);
+        closeInbox();
     }
 
     /**
@@ -108,11 +143,10 @@ public final class MailSteps extends Matchers {
      * @param subject   last mail message subject
      * @return message with parameters
      */
-    private MimeMessage findMessageWithParameters(final String recipient,
-                                                  final String subject) {
-        StringBuilder recipientsAndSubjects = new StringBuilder();
-        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
-        for (MimeMessage mimeMessage : receivedMessages) {
+    private MimeMessage findMessageWithParams(final String recipient,
+                                              final String subject) {
+        recipientsAndSubjects = new StringBuilder();
+        for (MimeMessage mimeMessage : getReceivedMessages()) {
             try {
                 for (Address address : mimeMessage.getRecipients(
                         Message.RecipientType.TO)) {
@@ -128,13 +162,42 @@ public final class MailSteps extends Matchers {
                     }
                 }
             } catch (MessagingException e) {
-                continue;
+                LOG.warning(e.getMessage());
             }
         }
-        throw new AssertionError("Could not find message with parameters: "
-                + "recipient - " + recipient + ", subject - " + subject
-                + "\nin mailbox with : "
-                + recipientsAndSubjects.toString());
+        return null;
+    }
+
+    /**
+     * Wait until received message with parameters.
+     *
+     * @param recipient of email
+     * @param subject   of email
+     */
+    private void waitUntilReceivedMessageWithParameters(final String recipient,
+                                                        final String subject) {
+        final FluentWait<String> wait = new FluentWait<>(recipient)
+                .withTimeout(Resources.base().explicitWait(), TimeUnit.SECONDS)
+                .pollingEvery(Resources.base().pollingInterval(),
+                        TimeUnit.MILLISECONDS);
+        try {
+            wait.until(new Predicate<String>() {
+                @Override
+                public boolean apply(final String recipient) {
+                    try {
+                        openInboxAs(recipient);
+                    } catch (AuthenticationFailedException e) {
+                        return false;
+                    }
+                    return findMessageWithParams(recipient, subject) != null;
+                }
+            });
+        } catch (TimeoutException e) {
+            throw new AssertionError("Could not find message with parameters: "
+                    + "recipient - " + recipient + ", subject - " + subject
+                    + "\nin mailbox with : "
+                    + recipientsAndSubjects.toString());
+        }
     }
 
     /**
@@ -144,5 +207,77 @@ public final class MailSteps extends Matchers {
      */
     protected GreenMail getGreenMail() {
         return greenMail;
+    }
+
+    /**
+     * Open POP3 connection to Inbox.
+     *
+     * @param user to connect
+     * @throws javax.mail.AuthenticationFailedException wrong credentials
+     */
+    private void openInboxAs(final String user)
+            throws AuthenticationFailedException {
+        Properties properties = System.getProperties();
+        Session session = Session.getDefaultInstance(properties);
+        URLName urlName = new URLName("pop3", "localhost",
+                ServerSetupTest.POP3.getPort(), null,
+                user, user);
+        try {
+            store = session.getStore(urlName);
+            store.connect();
+            inbox = store.getFolder("Inbox");
+            inbox.open(Folder.READ_ONLY);
+        } catch (MessagingException e) {
+            if (e instanceof AuthenticationFailedException) {
+                throw (AuthenticationFailedException) e;
+            } else {
+                LOG.warning(e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Get all emails.
+     *
+     * @return all messages
+     */
+    private MimeMessage[] getReceivedMessages() {
+        Message[] messages = new Message[0];
+        try {
+            messages = inbox.getMessages();
+        } catch (MessagingException e) {
+            LOG.warning(e.getMessage());
+        }
+        MimeMessage[] mimeMessages = new MimeMessage[messages.length];
+        for (int i = 0; i < messages.length; i++) {
+            if (messages[i] instanceof MimeMessage) {
+                mimeMessages[i] = (MimeMessage) messages[i];
+            }
+        }
+        return mimeMessages;
+    }
+
+    /**
+     * Close POP3 connection to Inbox.
+     */
+    private void closeInbox() {
+        try {
+            inbox.close(true);
+            store.close();
+        } catch (MessagingException e) {
+            LOG.warning(e.getMessage());
+        }
+    }
+
+    /**
+     * Handle exceptions when email servers is already started.
+     */
+    private static class SilentExceptionHandler
+            implements Thread.UncaughtExceptionHandler {
+        @Override
+        public void uncaughtException(final Thread t,
+                                      final Throwable e) {
+            LOG.fine("Email server is already started");
+        }
     }
 }
