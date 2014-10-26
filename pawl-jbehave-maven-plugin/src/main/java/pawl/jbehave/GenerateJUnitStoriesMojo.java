@@ -84,14 +84,14 @@ public class GenerateJUnitStoriesMojo
                 String name = getClassNameFrom(storyFile.getName());
                 JDefinedClass runnerClass = codeModel._class(
                         relative + name + "IT");
-                runnerClass._extends(AbstractWebStories.class);
+                runnerClass._extends(AbstractWebStory.class);
             } catch (JClassAlreadyExistsException e) {
                 getLog().error(e);
             }
         }
         File outputDir = getOutputDirectory();
         if (!outputDir.exists()
-                && outputDir.mkdir()) {
+                && outputDir.mkdirs()) {
             outputDir = getOutputDirectory();
         }
         try {

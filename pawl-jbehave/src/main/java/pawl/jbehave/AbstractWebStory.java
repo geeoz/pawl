@@ -68,7 +68,7 @@ import static org.jbehave.core.reporters.Format.TXT;
  * @see pawl.jbehave.step.BrowserSteps#verifyElementText(String, String)
  * @see pawl.jbehave.step.BrowserSteps#verifyElementIsNotPresent(String)
  */
-public abstract class AbstractWebStories extends JUnitStory {
+public abstract class AbstractWebStory extends JUnitStory {
     /**
      * JBehave web driver provider.
      */
@@ -92,13 +92,15 @@ public abstract class AbstractWebStories extends JUnitStory {
     /**
      * JBehave user story launcher.
      */
-    public AbstractWebStories() {
+    public AbstractWebStory() {
         super();
         configuredEmbedder().embedderControls()
                 .useThreads(Resources.base().useThreads())
                 .useStoryTimeoutInSecs(
                         Resources.base().useStoryTimeoutInSecs())
-                .doIgnoreFailureInStories(true)
+                .doGenerateViewAfterStories(false)
+                .doIgnoreFailureInView(true)
+                .doIgnoreFailureInStories(false)
                 .doBatch(true);
     }
 

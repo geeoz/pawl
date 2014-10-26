@@ -1,10 +1,10 @@
 
 package pawl.jbehave.plugins;
 
-import pawl.jbehave.AbstractWebStories;
+import pawl.jbehave.AbstractWebStory;
 
 public class APassingBehaviorIT
-    extends AbstractWebStories
+    extends AbstractWebStory
 {
 
 
