@@ -28,7 +28,7 @@ import java.net.URL;
  * Steps in browser verification.
  *
  * @author Mike Dolinin
- * @version 1.1 7/30/14
+ * @version 1.2 11/21/14
  */
 public class BrowserStepsIT {
 
@@ -56,6 +56,17 @@ public class BrowserStepsIT {
         browserSteps.verifyElementText("session-status", "Your session is xZ9TPyIvNgxP");
         browserSteps.expireUserSession();
         browserSteps.verifyElementText("session-status", "Your session is expired!");
+    }
+
+    @Test
+    public void shouldFillDataIntoInputField() {
+        BrowserSteps browserSteps = new BrowserSteps(pages);
+        browserSteps.setupLink("cookies_test_page");
+        browserSteps.openUrl();
+        browserSteps.verifyElementText("user-name", "");
+        browserSteps.fill("user-name", "Johny");
+        browserSteps.click("add-cookies");
+        browserSteps.verifyElementText("user", "Johny");
     }
 
     @After

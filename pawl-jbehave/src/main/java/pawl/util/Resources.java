@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  *
  * @author Alex Voloshyn
  * @author Mike Dolinin
- * @version 1.8 10/11/14
+ * @version 1.9 11/21/14
  * @see ResourceBundle
  */
 public final class Resources {
@@ -246,6 +246,9 @@ public final class Resources {
      * @return the string for the given key or null if resource is missing
      */
     public String string(final String key) {
+        if (key.isEmpty()) {
+            return null;
+        }
         return string(key, false);
     }
 
