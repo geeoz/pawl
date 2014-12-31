@@ -100,8 +100,8 @@
         <phantomjs-maven-plugin.version>0.4</phantomjs-maven-plugin.version>
         <!-- PhantomJS is a headless WebKit browser with a JavaScript API. -->
         <phantomjs.version>1.9.7</phantomjs.version>
-        <phantomjs-driver.version>1.2.0</phantomjs-driver.version>
-        <selenium-java.version>2.43.1</selenium-java.version>
+        <phantomjs-driver.version>1.2.1</phantomjs-driver.version>
+        <selenium-java.version>2.44.0</selenium-java.version>
         <commons-exec.version>1.2</commons-exec.version>
         <!-- Email test server versions -->
         <greenmail.version>1.3.1b</greenmail.version>
