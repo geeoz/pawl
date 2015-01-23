@@ -24,6 +24,12 @@
     <version>1.0d27-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <parent>
+        <groupId>com.geeoz</groupId>
+        <artifactId>geeoz</artifactId>
+        <version>1.0d3</version>
+    </parent>
+
     <dependencyManagement>
         <dependencies>
             <!-- TESTING DEPENDENCIES -->
@@ -33,20 +39,20 @@
             <dependency>
                 <groupId>org.hamcrest</groupId>
                 <artifactId>hamcrest-library</artifactId>
-                <version>${hamcrest.version}</version>
+                <version>${version.hamcrest}</version>
             </dependency>
             <!-- GreenMail is an open source, intuitive and easy-to-use test
                  suite of email servers for testing purposes. -->
             <dependency>
                 <groupId>com.icegreen</groupId>
                 <artifactId>greenmail</artifactId>
-                <version>${greenmail.version}</version>
+                <version>${version.greenmail}</version>
             </dependency>
             <!-- jsoup is a Java library for working with real-world HTML. -->
             <dependency>
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
-                <version>${jsoup.version}</version>
+                <version>${version.jsoup}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -57,35 +63,22 @@
     </modules>
 
     <properties>
-        <hamcrest.version>1.3</hamcrest.version>
-        <commons-exec.version>1.2</commons-exec.version>
-        <!-- Email test server versions -->
-        <greenmail.version>1.3.1b</greenmail.version>
-        <!-- HTML Parser -->
-        <jsoup.version>1.7.3</jsoup.version>
-        <selenium-java.version>2.44.0</selenium-java.version>
-
-        <!-- FUNCTIONAL CHECK -->
-        <!-- JBehave framework versions -->
-        <jbehave-core.version>4.0-beta-8</jbehave-core.version>
-        <jbehave-web-selenium.version>3.6-beta-2</jbehave-web-selenium.version>
-
-        <browser>phantomjs</browser>
         <!-- A maven plugin for installing the phantomjs binary on your system automatically. -->
-        <phantomjs-maven-plugin.version>0.4</phantomjs-maven-plugin.version>
-        <!-- PhantomJS is a headless WebKit browser with a JavaScript API. -->
-        <phantomjs.version>1.9.7</phantomjs.version>
-        <phantomjs-driver.version>1.2.1</phantomjs-driver.version>
+        <browser>phantomjs</browser>
+        <version.commons-exec>1.2</version.commons-exec>
+        <version.greenmail>1.4.0</version.greenmail>
+        <version.hamcrest>1.3</version.hamcrest>
+        <version.jsoup>1.8.1</version.jsoup>
+        <version.jbehave-core>4.0-beta-11</version.jbehave-core>
+        <version.jbehave-web-selenium>3.6-beta-2</version.jbehave-web-selenium>
+        <version.phantomjs-maven-plugin>0.4</version.phantomjs-maven-plugin>
+        <version.phantomjs>1.9.8</version.phantomjs>
+        <version.phantomjs-driver>1.2.1</version.phantomjs-driver>
+        <version.selenium-java>2.44.0</version.selenium-java>
 
         <proxy.args />
         <!--<proxy.args>-Dhttp.proxyHost=proxy2.cht -Dhttp.proxyPort=3128</proxy.args>-->
     </properties>
-
-    <parent>
-        <groupId>com.geeoz</groupId>
-        <artifactId>geeoz</artifactId>
-        <version>1.0d1</version>
-    </parent>
 
     <!-- Build settings -->
     <build>
@@ -121,9 +114,9 @@
                 <plugin>
                     <groupId>com.github.klieber</groupId>
                     <artifactId>phantomjs-maven-plugin</artifactId>
-                    <version>${phantomjs-maven-plugin.version}</version>
+                    <version>${version.phantomjs-maven-plugin}</version>
                     <configuration>
-                        <version>${phantomjs.version}</version>
+                        <version>${version.phantomjs}</version>
                     </configuration>
                 </plugin>
 

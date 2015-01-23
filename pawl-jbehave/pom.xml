@@ -28,7 +28,7 @@
         <dependency>
             <groupId>org.jbehave.web</groupId>
             <artifactId>jbehave-web-selenium</artifactId>
-            <version>${jbehave-web-selenium.version}</version>
+            <version>${version.jbehave-web-selenium}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.seleniumhq.selenium</groupId>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>${selenium-java.version}</version>
+            <version>${version.selenium-java}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
@@ -54,7 +54,7 @@
         <dependency>
             <groupId>com.codeborne</groupId>
             <artifactId>phantomjsdriver</artifactId>
-            <version>${phantomjs-driver.version}</version>
+            <version>${version.phantomjs-driver}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.seleniumhq.selenium</groupId>
@@ -69,7 +69,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-exec</artifactId>
-            <version>${commons-exec.version}</version>
+            <version>${version.commons-exec}</version>
         </dependency>
         <!-- GreenMail is an open source, intuitive and easy-to-use test
              suite of email servers for testing purposes. -->
@@ -91,7 +91,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.7</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
