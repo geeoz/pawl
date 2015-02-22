@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Geeoz Software
+ * Copyright 2015 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,14 @@ import static org.hamcrest.Matchers.is;
  * Resources contain objects from different areas.
  *
  * @author Alex Voloshyn
- * @version 1.2 2/28/14
+ * @version 1.3 1/23/15
  */
 public class ResourcesTest {
     @Test
     public void shouldRetrieveValueFromDefaultProperties() {
         final Resources resources = Resources.get("base-default");
         assertThat("Should retrieve value from default properties.",
-                resources.explicitWait(), is(equalTo(60)));
+                resources.explicitWait(), is(equalTo(10)));
     }
 
     @Test

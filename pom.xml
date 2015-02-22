@@ -27,7 +27,7 @@
     <parent>
         <groupId>com.geeoz</groupId>
         <artifactId>geeoz</artifactId>
-        <version>1.0d3</version>
+        <version>1.0d4</version>
     </parent>
 
     <dependencyManagement>
