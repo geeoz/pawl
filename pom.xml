@@ -65,7 +65,7 @@
     <properties>
         <!-- A maven plugin for installing the phantomjs binary on your system automatically. -->
         <browser>phantomjs</browser>
-        <version.commons-exec>1.2</version.commons-exec>
+        <version.commons-exec>1.3</version.commons-exec>
         <version.greenmail>1.4.0</version.greenmail>
         <version.hamcrest>1.3</version.hamcrest>
         <version.jsoup>1.8.1</version.jsoup>
@@ -73,8 +73,8 @@
         <version.jbehave-web-selenium>3.6-beta-2</version.jbehave-web-selenium>
         <version.phantomjs-maven-plugin>0.4</version.phantomjs-maven-plugin>
         <version.phantomjs>1.9.8</version.phantomjs>
-        <version.phantomjs-driver>1.2.1</version.phantomjs-driver>
-        <version.selenium-java>2.44.0</version.selenium-java>
+        <version.phantomjsdriver>1.2.1</version.phantomjsdriver>
+        <version.selenium-java>2.45.0</version.selenium-java>
 
         <proxy.args />
         <!--<proxy.args>-Dhttp.proxyHost=proxy2.cht -Dhttp.proxyPort=3128</proxy.args>-->

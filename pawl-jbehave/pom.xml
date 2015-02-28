@@ -54,7 +54,7 @@
         <dependency>
             <groupId>com.codeborne</groupId>
             <artifactId>phantomjsdriver</artifactId>
-            <version>${version.phantomjs-driver}</version>
+            <version>${version.phantomjsdriver}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.seleniumhq.selenium</groupId>
