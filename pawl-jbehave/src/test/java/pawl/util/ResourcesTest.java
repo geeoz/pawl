@@ -33,7 +33,7 @@ public class ResourcesTest {
     public void shouldRetrieveValueFromDefaultProperties() {
         final Resources resources = Resources.get("base-default");
         assertThat("Should retrieve value from default properties.",
-                resources.explicitWait(), is(equalTo(10)));
+                resources.explicitWait(), is(equalTo(60)));
     }
 
     @Test
