@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Geeoz Software
+ * Copyright 2015 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -7,16 +7,15 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package pawl.util;
 
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -27,7 +26,7 @@ import java.util.Set;
  * Provide different expected conditions for webdriver.
  *
  * @author Mike Dolinin
- * @version 1.0 8/19/14
+ * @version 1.1 5/2/15
  */
 public final class WebExpectedConditions {
 
@@ -56,18 +55,6 @@ public final class WebExpectedConditions {
     public ExpectedCondition<String> anyWindowOtherThan(
             final Set<String> windows) {
         return new NewWindowExpectedCondition(windows);
-    }
-
-    /**
-     * Continuously check active counter.
-     * When counter become 0 return true.
-     *
-     * @param counterStateFunction js function
-     * @return expected condition result
-     */
-    public ExpectedCondition<Boolean> complete(
-            final String counterStateFunction) {
-        return new CounterExpectedCondition(counterStateFunction);
     }
 
     /**
@@ -109,56 +96,4 @@ public final class WebExpectedConditions {
         }
     }
 
-    /**
-     * Get expected conditions for counter.
-     */
-    private static class CounterExpectedCondition
-            implements ExpectedCondition<Boolean> {
-
-        /**
-         * Handle js function for counter check.
-         */
-        private final String counterJsFunction;
-        /**
-         * Handle counter.
-         */
-        private Long counter;
-
-        /**
-         * Create an object expected conditions for counter.
-         *
-         * @param counterStateFunction js function.
-         */
-        public CounterExpectedCondition(final String counterStateFunction) {
-            this.counterJsFunction = counterStateFunction;
-        }
-
-        /**
-         * Check condition.
-         *
-         * @param driver for browser
-         * @return check state
-         */
-        public Boolean apply(final WebDriver driver) {
-            if (driver == null) {
-                throw new WebDriverException();
-            }
-            try {
-
-                counter = (Long) ((JavascriptExecutor) driver)
-                        .executeScript("return " + counterJsFunction + ";",
-                                new Object[]{});
-            } catch (WebDriverException e) {
-                counter = (long) 0;
-            }
-            return counter == 0;
-        }
-
-        @Override
-        public String toString() {
-            return "CounterExpectedCondition{"
-                    + "counterJsFunction='" + counterJsFunction + '\''
-                    + ", counter=" + counter + '}';
-        }
-    }
 }

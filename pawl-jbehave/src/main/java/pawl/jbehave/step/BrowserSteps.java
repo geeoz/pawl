@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Geeoz Software
+ * Copyright 2015 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -53,7 +52,7 @@ import static org.junit.Assert.fail;
  * @author Alex Voloshyn
  * @author Mike Dolinin
  * @author Serge Voloshyn
- * @version 1.15 10/11/14
+ * @version 1.16 5/2/15
  */
 public final class BrowserSteps extends Matchers {
     /**
@@ -123,24 +122,6 @@ public final class BrowserSteps extends Matchers {
     }
 
     /**
-     * Action to wait with timeout for all animations complete.
-     */
-    private void waitForActiveAnimationsComplete() {
-        getWait().until(WebExpectedConditions.get()
-                .complete("activeAnimations()"));
-    }
-
-    /**
-     * Creates new wait with timeout from properties.
-     *
-     * @return wait
-     */
-    public WebDriverWait getWait() {
-        return new WebDriverWait(browser.base(),
-                Resources.base().explicitWait());
-    }
-
-    /**
      * Action for click web element.
      *
      * @param identity element identity for search
@@ -148,7 +129,7 @@ public final class BrowserSteps extends Matchers {
     @When("I click '$identity'")
     @Alias("click '$identity'")
     public void click(final String identity) {
-        getVisibleElement(identity).click();
+        browser.base().find(identity).click();
     }
 
     /**
@@ -163,7 +144,7 @@ public final class BrowserSteps extends Matchers {
     public void clickWithOffset(final String identity,
                                 final String xOffset,
                                 final String yOffset) {
-        final WebElement webElement = getVisibleElement(identity);
+        final WebElement webElement = browser.base().find(identity);
         final Actions builder = new Actions(browser.base());
         builder.moveToElement(webElement).moveByOffset(
                 Integer.parseInt(xOffset), Integer.parseInt(yOffset))
@@ -184,7 +165,7 @@ public final class BrowserSteps extends Matchers {
     @Alias("choose '$className' with '$value' in '$parentIdentifier'")
     public void choose(final String className, final String value,
                        final String parentIdentifier) {
-        final WebElement parent = getVisibleElement(parentIdentifier);
+        final WebElement parent = browser.base().find(parentIdentifier);
         final List<WebElement> elements
                 = parent.findElements(By.className(className));
         assertThat("Page elements should exists: class name '" + className
@@ -213,7 +194,7 @@ public final class BrowserSteps extends Matchers {
         final URL resource = Thread.currentThread().getContextClassLoader()
                 .getResource(fileRelativePath);
         assert resource != null;
-        final WebElement element = getVisibleElement(identity);
+        final WebElement element = browser.base().find(identity);
 
         if (element.isDisplayed()) {
             element.clear();
@@ -236,53 +217,12 @@ public final class BrowserSteps extends Matchers {
     }
 
     /**
-     * Retrieve an web elements that should be visible on current page.
-     *
-     * @param identity an identity of the element
-     * @return a web elements that was found
-     */
-    private List<WebElement> getVisibleElements(final String identity) {
-        waitForActiveAnimationsComplete();
-        By locator = parseBy(identity);
-        getWait().until(ExpectedConditions
-                .visibilityOfAllElementsLocatedBy(locator));
-        return browser.base().findElements(locator);
-    }
-
-    /**
-     * Covert user string to By objects.
-     *
-     * @param identity an identity of the element
-     * @return By selector
-     */
-    private By parseBy(final String identity) {
-        By selector = new By.ById(identity);
-        if (identity.startsWith("/")) {
-            selector = new By.ByXPath(identity);
-        } else if (identity.startsWith("#") || identity.startsWith(".")) {
-            selector = new By.ByCssSelector(identity);
-        }
-        return selector;
-    }
-
-    /**
-     * Retrieve web element which may be visible on current page.
-     *
-     * @param identity an identity of the element
-     * @return web element which were found
-     */
-    private WebElement getVisibleElement(final String identity) {
-        return getVisibleElements(identity).get(0);
-    }
-
-    /**
      * Action for click on link.
      *
      * @param href attribute for search link on page
      */
     @When("I click on link '$href'")
     public void clickOnLinkWithAttribute(final String href) {
-        waitForActiveAnimationsComplete();
         browser.base().findElement(
                 By.xpath(".//a[@href='" + href + "']")).click();
     }
@@ -296,10 +236,9 @@ public final class BrowserSteps extends Matchers {
     @When("I fill '$identity' with '$value'")
     @Alias("fill '$identity' with '$value'")
     public void fill(final String identity, final String text) {
-        final WebElement element = getVisibleElement(identity);
-        element.clear();
-        element.sendKeys(getTextFromStorageIfExist(
-                Resources.base().string(text, text)));
+        String textFromStorageIfExist = getTextFromStorageIfExist(
+                Resources.base().string(text, text));
+        browser.base().find(identity).fillWith(textFromStorageIfExist);
     }
 
     /**
@@ -310,8 +249,7 @@ public final class BrowserSteps extends Matchers {
     @When("I press ENTER on '$identity'")
     @Alias("press ENTER on '$identity'")
     public void pressEnter(final String identity) {
-        final WebElement element = getVisibleElement(identity);
-        element.sendKeys(Keys.ENTER);
+        browser.base().find(identity).sendKeys(Keys.ENTER);
     }
 
     /**
@@ -323,7 +261,7 @@ public final class BrowserSteps extends Matchers {
     @When("I select '$identity' with '$value'")
     @Alias("select '$identity' with '$value'")
     public void select(final String identity, final String value) {
-        final WebElement element = getVisibleElement(identity);
+        final WebElement element = browser.base().find(identity);
         final Select select = new Select(element);
         select.selectByVisibleText(Resources.base().string(value, value));
     }
@@ -349,8 +287,7 @@ public final class BrowserSteps extends Matchers {
      */
     @Then("I get title '$title'")
     public void verifyTitle(final String title) {
-        waitForActiveAnimationsComplete();
-        getWait().until(ExpectedConditions
+        browser.base().getWait().until(ExpectedConditions
                 .titleIs(Resources.base().string(title, title)));
     }
 
@@ -362,9 +299,9 @@ public final class BrowserSteps extends Matchers {
     @Then("I get text '$text'")
     @Alias("text '$text'")
     public void verifySource(final String text) {
-        waitForActiveAnimationsComplete();
-        assertTrue("Page source should contains the text.",
-                browser.base().getPageSource().contains(
+        browser.base().getWait().until(
+                ExpectedConditions.textToBePresentInElementLocated(
+                        By.tagName("body"),
                         Resources.base().string(text, text)));
     }
 
@@ -377,7 +314,7 @@ public final class BrowserSteps extends Matchers {
     @Alias("'$elementId' element")
     public void verifyElement(final String identity) {
         assertThat("Page element should exists: '" + identity,
-                getVisibleElement(identity),
+                browser.base().find(identity),
                 is(notNullValue()));
     }
 
@@ -390,9 +327,9 @@ public final class BrowserSteps extends Matchers {
     @Then("I get no '$identity' element")
     @Alias("no '$elementId' element")
     public void verifyElementIsNotPresent(final String identity) {
-        waitForActiveAnimationsComplete();
-        getWait().until(ExpectedConditions.invisibilityOfElementLocated(
-                parseBy(identity)));
+        browser.base().getWait().until(
+                ExpectedConditions.invisibilityOfElementLocated(
+                        browser.base().parseBy(identity)));
     }
 
     /**
@@ -405,7 +342,7 @@ public final class BrowserSteps extends Matchers {
     @Alias("'$identity' link")
     public void verifyLink(final String identity) {
         assertThat("Page element should exists: '" + identity,
-                getVisibleElement(identity).getTagName(),
+                browser.base().find(identity).getTagName(),
                 is(equalTo("a")));
     }
 
@@ -418,36 +355,9 @@ public final class BrowserSteps extends Matchers {
     @Then("I get '$identity' with '$text'")
     @Alias("'$identity' with '$text'")
     public void verifyElementText(final String identity, final String text) {
-        final WebElement element = getVisibleElement(identity);
-        assertThat("Page element should exists: '" + identity + "'",
-                element, is(notNullValue()));
-        final String value = Resources.base().string(text, text);
-        assertThat(String.format(
-                        "Page element '%s' should have text: '%s'",
-                        identity, value),
-                getTextFrom(element),
-                is(equalTo(getTextFromStorageIfExist(value))));
-    }
-
-    /**
-     * Retrieve a text from input/textarea/element.
-     *
-     * @param element an element for process
-     * @return text value from input element
-     */
-    private String getTextFrom(final WebElement element) {
-        final String elementTag = element.getTagName();
-        final String elementText;
-        switch (elementTag) {
-            case "input":
-            case "textarea":
-                elementText = element.getAttribute("value");
-                break;
-            default:
-                elementText = element.getText();
-                break;
-        }
-        return elementText;
+        String textFromStorageIfExist = getTextFromStorageIfExist(
+                Resources.base().string(text, text));
+        browser.base().find(identity).shouldHaveText(textFromStorageIfExist);
     }
 
     /**
@@ -459,7 +369,7 @@ public final class BrowserSteps extends Matchers {
      */
     @When("I remember text from '$identity' to '$key' variable")
     public void storeTextFromElement(final String identity, final String key) {
-        Resources.context().put(key, getTextFrom(getVisibleElement(identity)));
+        Resources.context().put(key, browser.base().find(identity).getText());
     }
 
     /**

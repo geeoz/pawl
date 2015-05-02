@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Geeoz Software
+ * Copyright 2015 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ import java.util.logging.Logger;
  * a regex pattern that matches the textual step.
  *
  * @author Alex Voloshyn
- * @version 1.0 2/27/14
+ * @version 1.1 5/2/15
  */
 public final class MailSteps {
     /**
@@ -78,7 +78,7 @@ public final class MailSteps {
     /**
      * All recipients and subjects in inbox.
      */
-    private StringBuilder recipientsAndSubjects;
+    private StringBuilder recipientsAndSubjects = new StringBuilder();
 
     /**
      * Start Email Test Server.

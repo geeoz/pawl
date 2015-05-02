@@ -21,13 +21,13 @@
     <!-- The basics -->
     <groupId>com.geeoz.pawl</groupId>
     <artifactId>pawl</artifactId>
-    <version>1.0d30-SNAPSHOT</version>
+    <version>0.30.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>com.geeoz</groupId>
         <artifactId>geeoz</artifactId>
-        <version>1.0d4</version>
+        <version>0.6.0</version>
     </parent>
 
     <dependencyManagement>
@@ -66,15 +66,15 @@
         <!-- A maven plugin for installing the phantomjs binary on your system automatically. -->
         <browser>phantomjs</browser>
         <version.commons-exec>1.3</version.commons-exec>
-        <version.greenmail>1.4.0</version.greenmail>
+        <version.greenmail>1.4.1</version.greenmail>
         <version.hamcrest>1.3</version.hamcrest>
-        <version.jsoup>1.8.1</version.jsoup>
+        <version.jsoup>1.8.2</version.jsoup>
         <version.jbehave-core>4.0-beta-11</version.jbehave-core>
         <version.jbehave-web-selenium>3.6-beta-2</version.jbehave-web-selenium>
-        <version.phantomjs-maven-plugin>0.4</version.phantomjs-maven-plugin>
         <version.phantomjs>1.9.8</version.phantomjs>
         <version.phantomjsdriver>1.2.1</version.phantomjsdriver>
         <version.selenium-java>2.45.0</version.selenium-java>
+        <version.maven-plugin-plugin>3.4</version.maven-plugin-plugin>
 
         <proxy.args />
         <!--<proxy.args>-Dhttp.proxyHost=proxy2.cht -Dhttp.proxyPort=3128</proxy.args>-->
@@ -150,6 +150,14 @@
                     <configuration>
                         <configLocation>${main.basedir}/scalastyle.xml</configLocation>
                     </configuration>
+                </plugin>
+                <!-- The Maven Plugin Plugin is used to create a Maven
+                     plugin descriptor for any Mojo's
+                     found in the source tree, to include in the JAR. -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>${version.maven-plugin-plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
