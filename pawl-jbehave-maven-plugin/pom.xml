@@ -2,7 +2,7 @@
     <parent>
         <artifactId>pawl</artifactId>
         <groupId>com.geeoz.pawl</groupId>
-        <version>0.30.0</version>
+        <version>0.30.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>pawl-jbehave-maven-plugin</artifactId>
