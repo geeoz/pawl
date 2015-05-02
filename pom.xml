@@ -21,7 +21,7 @@
     <!-- The basics -->
     <groupId>com.geeoz.pawl</groupId>
     <artifactId>pawl</artifactId>
-    <version>0.30.0-SNAPSHOT</version>
+    <version>0.30.0</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -211,6 +211,6 @@
         <connection>scm:git:ssh://git@bitbucket.org/geeoz/pawl</connection>
         <developerConnection>scm:git:ssh://git@bitbucket.org/geeoz/pawl</developerConnection>
         <url>https://bitbucket.org/geeoz/pawl</url>
-        <tag>develop</tag>
+        <tag>0.30.0</tag>
     </scm>
 </project>
