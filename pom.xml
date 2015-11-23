@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2013 Geeoz Software
+  ~ Copyright 2015 Geeoz Software
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -21,8 +21,14 @@
     <!-- The basics -->
     <groupId>com.geeoz.pawl</groupId>
     <artifactId>pawl</artifactId>
-    <version>1.0d1-SNAPSHOT</version>
+    <version>0.30.1-SNAPSHOT</version>
     <packaging>pom</packaging>
+
+    <parent>
+        <groupId>com.geeoz</groupId>
+        <artifactId>geeoz</artifactId>
+        <version>0.6.0</version>
+    </parent>
 
     <dependencyManagement>
         <dependencies>
@@ -33,337 +39,134 @@
             <dependency>
                 <groupId>org.hamcrest</groupId>
                 <artifactId>hamcrest-library</artifactId>
-                <version>${hamcrest.version}</version>
+                <version>${version.hamcrest}</version>
+            </dependency>
+            <!-- GreenMail is an open source, intuitive and easy-to-use test
+                 suite of email servers for testing purposes. -->
+            <dependency>
+                <groupId>com.icegreen</groupId>
+                <artifactId>greenmail</artifactId>
+                <version>${version.greenmail}</version>
+            </dependency>
+            <!-- jsoup is a Java library for working with real-world HTML. -->
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${version.jsoup}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <modules>
         <module>pawl-jbehave</module>
+        <module>pawl-jbehave-maven-plugin</module>
     </modules>
 
     <properties>
-        <main.basedir>${project.basedir}</main.basedir>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- A maven plugin for installing the phantomjs binary on your system automatically. -->
+        <browser>phantomjs</browser>
+        <version.commons-exec>1.3</version.commons-exec>
+        <version.greenmail>1.4.1</version.greenmail>
+        <version.hamcrest>1.3</version.hamcrest>
+        <version.jsoup>1.8.2</version.jsoup>
+        <version.jbehave-core>4.0-beta-11</version.jbehave-core>
+        <version.jbehave-web-selenium>3.6-beta-2</version.jbehave-web-selenium>
+        <version.phantomjs>1.9.8</version.phantomjs>
+        <version.phantomjsdriver>1.2.1</version.phantomjsdriver>
+        <version.selenium-java>2.45.0</version.selenium-java>
+        <version.maven-plugin-plugin>3.4</version.maven-plugin-plugin>
+
         <proxy.args />
-        <!--<proxy.args>-Dhttp.proxyHost=proxy2.cht -Dhttp.proxyPort=3128 -Dhttps.proxyHost=proxy2.cht -Dhttps.proxyPort=3128</proxy.args>-->
-        <hamcrest.version>1.3</hamcrest.version>
-        <!-- Maven plugin versions -->
-        <maven-clean-plugin.version>2.5</maven-clean-plugin.version>
-        <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
-        <maven-deploy-plugin.version>2.7</maven-deploy-plugin.version>
-        <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
-        <maven-javadoc-plugin.version>2.9.1</maven-javadoc-plugin.version>
-        <maven-install-plugin.version>2.4</maven-install-plugin.version>
-        <maven-release-plugin.version>2.4.1</maven-release-plugin.version>
-        <maven-resources-plugin.version>2.6</maven-resources-plugin.version>
-        <maven-site-plugin.version>3.3</maven-site-plugin.version>
-        <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
-        <maven-surefire-plugin.version>2.15</maven-surefire-plugin.version>
-        <!-- Code quality check maven plugin versions -->
-        <maven-checkstyle-plugin.version>2.10</maven-checkstyle-plugin.version>
-        <findbugs-maven-plugin.version>2.5.2</findbugs-maven-plugin.version>
-        <findbugs-annotations.version>1.0.0</findbugs-annotations.version>
-        <maven-jxr-plugin.version>2.3</maven-jxr-plugin.version>
-        <maven-pmd-plugin.version>3.0.1</maven-pmd-plugin.version>
-        <!-- Functional check maven plugin versions -->
-        <maven-failsafe-plugin.version>2.15</maven-failsafe-plugin.version>
-        <!-- Distribution sign -->
-        <maven-gpg-plugin.version>1.4</maven-gpg-plugin.version>
-
-        <!-- FUNCTIONAL CHECK -->
-        <!-- Skip tests flag -->
-        <skipTests />
-        <!-- JBehave framework versions -->
-        <jbehave-core.version>4.0-beta-3</jbehave-core.version>
-        <jbehave-web-selenium.version>3.6-beta-1</jbehave-web-selenium.version>
-        <selenium-java.version>2.38.0</selenium-java.version>
+        <!--<proxy.args>-Dhttp.proxyHost=proxy2.cht -Dhttp.proxyPort=3128</proxy.args>-->
     </properties>
-
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
 
     <!-- Build settings -->
     <build>
-        <plugins>
-            <!-- The Source Plugin creates a jar archive of the source files of
-                 the current project. The jar file is, by default, created in
-                 the project's target directory. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- The JXR Plugin produces a cross-reference of the
-                 project's sources. The generated reports make it easier
-                 for the user to reference or find specific lines of
-                 code. It is also handy when used with the PMD Plugin
-                 for referencing errors found in the code -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-                <version>${maven-jxr-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jxr</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- The Checkstyle Plugin generates a report regarding the
-                 code style used by the developers. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${maven-checkstyle-plugin.version}</version>
-                <configuration>
-                    <configLocation>${main.basedir}/checkstyle.xml</configLocation>
-                    <consoleOutput>true</consoleOutput>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- The PMD Plugin allows you to automatically run the PMD
-                 code analysis tool on your project's source code and
-                 generate a site report with its results. It also
-                 supports the separate Copy/Paste Detector tool (or CPD)
-                 distributed with PMD. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>${maven-pmd-plugin.version}</version>
-                <configuration>
-                    <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
-                    <verbose>true</verbose>
-                    <targetJdk>${maven.compiler.target}</targetJdk>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>check</goal>
-                            <goal>cpd-check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- FindBugs looks for bugs in Java programs. It is based
-                 on the concept of bug patterns. A bug pattern is a code
-                 idiom that is often an error. -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>${findbugs-maven-plugin.version}</version>
-                <configuration>
-                    <threshold>Low</threshold>
-                    <effort>Max</effort>
-                    <findbugsXmlOutput>true</findbugsXmlOutput>
-                    <excludeFilterFile>${main.basedir}/findbugs-exclude.xml</excludeFilterFile>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- The Failsafe Plugin is designed to run integration
-                 tests while the Surefire Plugins is designed to run
-                 unit tests. The name (failsafe) was chosen both because
-                 it is a synonym of surefire and because it implies that
-                 when it fails, it does so in a safe way. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${maven-failsafe-plugin.version}</version>
-                <configuration>
-                    <argLine>${proxy.args}</argLine>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
         <pluginManagement>
             <plugins>
-                <!-- The Clean Plugin is used when you want to remove files
-                     generated at build-time in a project's directory. -->
+                <!-- The Failsafe Plugin is designed to run integration
+                     tests while the Surefire Plugins is designed to run
+                     unit tests. The name (failsafe) was chosen both because
+                     it is a synonym of surefire and because it implies that
+                     when it fails, it does so in a safe way. -->
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-clean-plugin</artifactId>
-                    <version>${maven-clean-plugin.version}</version>
-                </plugin>
-                <!-- The Compiler Plugin is used to compile the sources of your
-                     project. -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven-compiler-plugin.version}</version>
-                </plugin>
-                <!-- The deploy plugin is primarily used during the deploy
-                     phase, to add your artifact(s) to a remote repository for
-                     sharing with other developers and projects. -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>${maven-deploy-plugin.version}</version>
-                </plugin>
-                <!-- This plugin provides the capability to build and sign
-                     jars. -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>${maven-jar-plugin.version}</version>
-                </plugin>
-                <!-- The Apache Maven Javadoc Plugin is a plugin that uses
-                     the javadoc tool for generating javadocs for the
-                     specified project. -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${maven-javadoc-plugin.version}</version>
-                </plugin>
-                <!-- The Install Plugin is used during the install phase to add
-                     artifact(s) to the local repository. The Install Plugin
-                     uses the information in the POM (groupId, artifactId,
-                     version) to determine the proper location for the artifact
-                     within the local repository. -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-install-plugin</artifactId>
-                    <version>${maven-install-plugin.version}</version>
-                </plugin>
-                <!-- This plugin is used to release a project with Maven, saving
-                     a lot of repetitive, manual work. Releasing a project is
-                     made in two steps: prepare and perform. -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>${maven-release-plugin.version}</version>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${version.maven-failsafe-plugin}</version>
                     <configuration>
-                        <tagNameFormat>@{project.version}</tagNameFormat>
+                        <argLine>-Dfile.encoding=UTF-8 ${proxy.args}</argLine>
+                        <systemProperties>
+                            <browser>${browser}</browser>
+                            <phantomjs.binary.path>${phantomjs.binary}</phantomjs.binary.path>
+                        </systemProperties>
                     </configuration>
-                </plugin>
-                <!-- The Resources Plugin handles the copying of project
-                     resources to the output directory. -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>${maven-resources-plugin.version}</version>
-                </plugin>
-                <!-- The Site Plugin is used to generate a site for the project.
-                     The generated site also includes the project's reports that
-                     were configured in the POM. -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <version>${maven-site-plugin.version}</version>
-                </plugin>
-                <!-- The Source Plugin creates a jar archive of the source files
-                     of the current project. The jar file is, by default,
-                     created in the project's target directory. -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${maven-source-plugin.version}</version>
                 </plugin>
                 <!-- The Surefire Plugin is used during the test phase of the
                      build lifecycle to execute the unit tests of an
                      application. -->
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
+                    <version>${version.maven-surefire-plugin}</version>
                     <configuration>
-                        <argLine>${proxy.args}</argLine>
+                        <argLine>-Dfile.encoding=UTF-8 ${proxy.args}</argLine>
                     </configuration>
                 </plugin>
-                <!-- Signs the project artifacts with GnuPG. -->
+                <!-- A plugin for downloading and installing phantomjs. -->
+                <plugin>
+                    <groupId>com.github.klieber</groupId>
+                    <artifactId>phantomjs-maven-plugin</artifactId>
+                    <version>${version.phantomjs-maven-plugin}</version>
+                    <configuration>
+                        <version>${version.phantomjs}</version>
+                    </configuration>
+                </plugin>
+
+                <!-- CODE QUALITY CHECK -->
+                <!-- The Checkstyle Plugin generates a report regarding the
+                     code style used by the developers. -->
+                <plugin>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${version.maven-checkstyle-plugin}</version>
+                    <configuration>
+                        <configLocation>${main.basedir}/checkstyle.xml</configLocation>
+                    </configuration>
+                </plugin>
+                <!-- FindBugs looks for bugs in Java programs. It is based
+                     on the concept of bug patterns. A bug pattern is a code
+                     idiom that is often an error. -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>${version.findbugs-maven-plugin}</version>
+                    <configuration>
+                        <excludeFilterFile>${main.basedir}/findbugs-exclude.xml</excludeFilterFile>
+                    </configuration>
+                </plugin>
+                <!-- Scalastyle examines your Scala code and indicates
+                     potential problems with it. -->
+                <plugin>
+                    <groupId>org.scalastyle</groupId>
+                    <artifactId>scalastyle-maven-plugin</artifactId>
+                    <version>${version.scalastyle-maven-plugin}</version>
+                    <configuration>
+                        <configLocation>${main.basedir}/scalastyle.xml</configLocation>
+                    </configuration>
+                </plugin>
+                <!-- The Maven Plugin Plugin is used to create a Maven
+                     plugin descriptor for any Mojo's
+                     found in the source tree, to include in the JAR. -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>${maven-gpg-plugin.version}</version>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>${version.maven-plugin-plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
     </build>
-    <profiles>
-        <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <!-- The Apache Maven Javadoc Plugin is a plugin that uses
-                         the javadoc tool for generating javadocs for the
-                          specified project. -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- Signs the project artifacts with GnuPG. -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <!-- More project information -->
     <name>PAWL</name>
     <description>A project to aid with test automation.</description>
-    <url>https://bitbucket.org/geeoz/travelport-api</url>
+    <url>https://bitbucket.org/geeoz/pawl</url>
 
     <licenses>
         <license>
@@ -410,9 +213,4 @@
         <url>https://bitbucket.org/geeoz/pawl</url>
         <tag>develop</tag>
     </scm>
-
-    <!-- Describes the prerequisites a project can have. -->
-    <prerequisites>
-        <maven>3.0.4]</maven>
-    </prerequisites>
 </project>

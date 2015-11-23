@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Geeoz Software
+ * Copyright 2014 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import static org.hamcrest.Matchers.not;
  * Provide simplification support for #equals(Object), #hashCode() and
  * #toString() verifications.
  *
- * @author Alexander Voloshyn
- * @version 1.0 2/7/2013
+ * @author Alex Voloshyn
+ * @version 1.0 2/7/13
  */
 public final class VerifyObjects {
     /**
@@ -40,7 +40,6 @@ public final class VerifyObjects {
 
     /**
      * Default constructor for objects verification support.
-     * <p/>
      *
      * @param object an object
      */
@@ -85,7 +84,7 @@ public final class VerifyObjects {
     /**
      * Provide verification check for equality for the specified object with
      * java.lang.Object.
-     * <p/>
+     * <p>
      * Equals and hashCodes should be different.
      */
     public void verifyInstanceOfCheck() {
@@ -98,7 +97,7 @@ public final class VerifyObjects {
 
     /**
      * Provide verification check for equality for the same object.
-     * <p/>
+     * <p>
      * In this case object1 == object1 should be true and hash codes should be
      * the same, too.
      */

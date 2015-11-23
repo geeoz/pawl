@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Geeoz Software
+ * Copyright 2014 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,10 @@
 
 package pawl.util;
 
+import com.google.common.collect.Maps;
+
+import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -25,7 +29,7 @@ import java.util.logging.Logger;
  * Resources contain objects from different areas. When your program needs
  * a resource, a <code>String</code> for example, your program can load it
  * from the system properties or specified resource bundle.
- * <p/>
+ * <p>
  * When your program needs an object, it loads the <code>Resources</code>
  * class using the {@link #get(String) get(String)}
  * method:
@@ -44,7 +48,7 @@ import java.util.logging.Logger;
  *
  * @author Alex Voloshyn
  * @author Mike Dolinin
- * @version 1.3 7/21/2013
+ * @version 1.9 11/21/14
  * @see ResourceBundle
  */
 public final class Resources {
@@ -61,6 +65,11 @@ public final class Resources {
      * System base name for resource bundle.
      */
     private static final String SYSTEM_BASE_NAME = "base-default";
+    /**
+     * Specifies map to store test session data.
+     */
+    private static final ThreadLocal<Map<String, String>> CONTEXT =
+            new ThreadLocal<>();
     /**
      * Resource bundle.
      */
@@ -80,7 +89,10 @@ public final class Resources {
      */
     private Resources(final String baseName) {
         this();
-        bundle = ResourceBundle.getBundle(baseName);
+        Locale locale = new Locale(
+                System.getProperty("user.language"),
+                System.getProperty("user.country"));
+        bundle = ResourceBundle.getBundle(baseName, locale);
     }
 
     /**
@@ -104,22 +116,15 @@ public final class Resources {
     }
 
     /**
-     * Get resources for the 'base-default' base name.
+     * Get context map.
      *
-     * @return a resources for the 'base-default' base name
+     * @return a context map
      */
-    private static Resources system() {
-        return get(SYSTEM_BASE_NAME);
-    }
-
-    /**
-     * Retrieves XPath for element identification.
-     *
-     * @param identity the value of the element identity
-     * @return XPath for element identification
-     */
-    public String identityXpath(final String identity) {
-        return String.format(string("xpath.identity"), identity);
+    public static Map<String, String> context() {
+        if (CONTEXT.get() == null) {
+            CONTEXT.set(Maps.<String, String>newConcurrentMap());
+        }
+        return CONTEXT.get();
     }
 
     /**
@@ -141,12 +146,69 @@ public final class Resources {
     }
 
     /**
+     * Return name of user session cookie.
+     *
+     * @return name
+     */
+    public String userSessionCookieName() {
+        return string("user.session.cookie.name");
+    }
+
+    /**
+     * Return log level for web-driver.
+     *
+     * @return log level
+     */
+    public String webDriverLogLevel() {
+        return string("webdriver.loglevel", "INFO");
+    }
+
+    /**
      * Return value for explicit wait.
      *
      * @return wait time
      */
     public int explicitWait() {
         return Integer.parseInt(string("explicit.wait.seconds"));
+    }
+
+    /**
+     * Return value for polling interval.
+     *
+     * @return polling interval time
+     */
+    public int pollingInterval() {
+        return Integer.parseInt(string("polling.interval.milliseconds"));
+    }
+
+    /**
+     * Return quantity of threads for tests execution.
+     *
+     * @return quantity of threads for tests execution
+     */
+    public int useThreads() {
+        if (System.getProperty("browser", "firefox").equals("phantomjs")) {
+            return 1;
+            //because of bug https://github.com/detro/ghostdriver/issues/170
+        } else {
+            int processors = Runtime.getRuntime().availableProcessors();
+            int threads = Integer.parseInt(
+                    string("use.threads", String.valueOf(processors)));
+            if (threads < processors) {
+                return threads;
+            } else {
+                return processors;
+            }
+        }
+    }
+
+    /**
+     * Return value for wait all stories executed.
+     *
+     * @return wait time
+     */
+    public long useStoryTimeoutInSecs() {
+        return Long.parseLong(string("story.timeout.in.secs"));
     }
 
     /**
@@ -184,6 +246,9 @@ public final class Resources {
      * @return the string for the given key or null if resource is missing
      */
     public String string(final String key) {
+        if (key.isEmpty()) {
+            return null;
+        }
         return string(key, false);
     }
 
@@ -211,7 +276,7 @@ public final class Resources {
         }
 
         if (result == null && !isSystem) {
-            result = system().string(key, true);
+            result = get(SYSTEM_BASE_NAME).string(key, true);
         }
 
         return result;

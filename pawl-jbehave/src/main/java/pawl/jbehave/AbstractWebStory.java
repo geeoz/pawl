@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Geeoz Software
+ * Copyright 2014 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,26 @@
 
 package pawl.jbehave;
 
-import com.google.common.util.concurrent.MoreExecutors;
 import org.jbehave.core.configuration.Configuration;
 import org.jbehave.core.io.LoadFromClasspath;
-import org.jbehave.core.io.StoryFinder;
-import org.jbehave.core.junit.JUnitStories;
+import org.jbehave.core.junit.JUnitStory;
 import org.jbehave.core.reporters.StoryReporterBuilder;
 import org.jbehave.core.steps.InjectableStepsFactory;
 import org.jbehave.core.steps.InstanceStepsFactory;
-import org.jbehave.web.selenium.PerStoriesWebDriverSteps;
-import org.jbehave.web.selenium.PropertyWebDriverProvider;
+import org.jbehave.web.selenium.PerStoryWebDriverSteps;
 import org.jbehave.web.selenium.SeleniumConfiguration;
 import org.jbehave.web.selenium.SeleniumContext;
 import org.jbehave.web.selenium.WebDriverProvider;
 import org.jbehave.web.selenium.WebDriverScreenshotOnFailure;
 import org.jbehave.web.selenium.WebDriverSteps;
+import pawl.jbehave.step.BrowserSteps;
+import pawl.jbehave.step.MailSteps;
 import pawl.util.Resources;
+import pawl.webdriver.LocalizedWebDriverProvider;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import static java.util.Arrays.asList;
-import static org.jbehave.core.io.CodeLocations.codeLocationFromClass;
 import static org.jbehave.core.reporters.Format.CONSOLE;
 import static org.jbehave.core.reporters.Format.TXT;
 
@@ -46,16 +45,20 @@ import static org.jbehave.core.reporters.Format.TXT;
  * properties.
  *
  * @author Alex Voloshyn
+ * @author Mike Dolinin
  * @author Serge Voloshyn
- * @version 1.4 6/9/2013
+ * @version 1.5 2/26/14
  * @see pawl.jbehave.step.BrowserSteps#setupLink(String)
  * @see pawl.jbehave.step.BrowserSteps#openUrl()
  * @see pawl.jbehave.step.BrowserSteps#openContextPath(String)
  * @see pawl.jbehave.step.BrowserSteps#refreshPage()
- * @see pawl.jbehave.step.BrowserSteps#wait(String)
+ * @see pawl.jbehave.step.BrowserSteps#choose(String, String, String)
  * @see pawl.jbehave.step.BrowserSteps#click(String)
+ * @see pawl.jbehave.step.BrowserSteps#clickWithOffset(String, String, String)
  * @see pawl.jbehave.step.BrowserSteps#clickOnLinkWithAttribute(String)
  * @see pawl.jbehave.step.BrowserSteps#fill(String, String)
+ * @see pawl.jbehave.step.BrowserSteps#fillFile(String, String)
+ * @see pawl.jbehave.step.BrowserSteps#select(String, String)
  * @see pawl.jbehave.step.BrowserSteps#storeTextFromElement(String, String)
  * @see pawl.jbehave.step.BrowserSteps#switchToNewWindow()
  * @see pawl.jbehave.step.BrowserSteps#verifyTitle(String)
@@ -63,32 +66,42 @@ import static org.jbehave.core.reporters.Format.TXT;
  * @see pawl.jbehave.step.BrowserSteps#verifyElement(String)
  * @see pawl.jbehave.step.BrowserSteps#verifyLink(String)
  * @see pawl.jbehave.step.BrowserSteps#verifyElementText(String, String)
+ * @see pawl.jbehave.step.BrowserSteps#verifyElementIsNotPresent(String)
  */
-public abstract class AbstractWebStories extends JUnitStories {
+public abstract class AbstractWebStory extends JUnitStory {
     /**
      * JBehave web driver provider.
      */
     private final transient WebDriverProvider driverProvider =
-            new PropertyWebDriverProvider();
+            new LocalizedWebDriverProvider();
     /**
      * JBehave web driver provider.
      */
     private final transient WebDriverSteps lifecycleSteps =
-            new PerStoriesWebDriverSteps(driverProvider);
+            new PerStoryWebDriverSteps(driverProvider);
     /**
      * Web testing context.
      */
     private final transient SeleniumContext context = new SeleniumContext();
 
     /**
+     * Web pages collection factory.
+     */
+    private final transient Pages pages = new Pages(getDriverProvider());
+
+    /**
      * JBehave user story launcher.
      */
-    public AbstractWebStories() {
+    public AbstractWebStory() {
         super();
-        // If configuring lifecycle per-stories, you need to ensure that you
-        // a same-thread executor
-        configuredEmbedder().useExecutorService(
-                MoreExecutors.sameThreadExecutor());
+        configuredEmbedder().embedderControls()
+                .useThreads(Resources.base().useThreads())
+                .useStoryTimeoutInSecs(
+                        Resources.base().useStoryTimeoutInSecs())
+                .doGenerateViewAfterStories(false)
+                .doIgnoreFailureInView(true)
+                .doIgnoreFailureInStories(false)
+                .doBatch(true);
     }
 
     // Here we specify the configuration, starting from default
@@ -103,7 +116,8 @@ public abstract class AbstractWebStories extends JUnitStories {
                         // CONSOLE and TXT reporting
                 .useStoryReporterBuilder(
                         new StoryReporterBuilder().withDefaultFormats()
-                                .withFormats(CONSOLE, TXT));
+                                .withFormats(CONSOLE, TXT))
+                .useStoryPathResolver(new UnderscoredCamelCaseITResolver());
     }
 
     // Here we specify the steps classes
@@ -117,27 +131,6 @@ public abstract class AbstractWebStories extends JUnitStories {
         return new InstanceStepsFactory(configuration(), steps);
     }
 
-    @Override
-    protected final List<String> storyPaths() {
-        // Specify story paths as URLs
-        final String file = codeLocationFromClass(this.getClass()).getFile();
-        return new StoryFinder().findPaths(file,
-                asList(getStoriesToRun()), asList(""));
-    }
-
-    /**
-     * Path pattern for user stories.
-     *
-     * @return path pattern for user stories.
-     */
-    private String getStoriesToRun() {
-        String result = storiesToRun();
-        if (result == null) {
-            result = Resources.base().webStoriesToRun();
-        }
-        return result;
-    }
-
     /**
      * Gets current web driver provider.
      *
@@ -148,16 +141,14 @@ public abstract class AbstractWebStories extends JUnitStories {
     }
 
     /**
-     * Gets stories for run.
-     *
-     * @return path patters for story paths
-     */
-    protected abstract String storiesToRun();
-
-    /**
      * Gets steps for include.
      *
      * @return steps instances
      */
-    protected abstract List<Object> stepsInstances();
+    private List<Object> stepsInstances() {
+        final List<Object> list = new LinkedList<>();
+        list.add(new BrowserSteps(pages));
+        list.add(new MailSteps());
+        return list;
+    }
 }

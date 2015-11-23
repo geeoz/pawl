@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Geeoz Software
+ * Copyright 2015 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package pawl.jbehave;
 
-import org.jbehave.web.selenium.WebDriverPage;
 import org.jbehave.web.selenium.WebDriverProvider;
 import pawl.util.Resources;
 
@@ -31,8 +30,8 @@ import java.util.logging.Logger;
  * class level still remains the same. Typically, the implementation of a step
  * requires interaction with more than one page.
  *
- * @author Alexander Voloshyn
- * @version 1.0 12/13/2012
+ * @author Alex Voloshyn
+ * @version 1.1 5/2/15
  */
 public final class Pages {
     /**
@@ -80,7 +79,7 @@ public final class Pages {
      *
      * @return common web page
      */
-    public WebDriverPage base() {
+    public BasePage base() {
         beforeAction();
         if (page == null) {
             page = new BasePage(provider);
@@ -88,31 +87,4 @@ public final class Pages {
         return page;
     }
 
-    /**
-     * Base web page object that contains common methods.
-     */
-    static final class BasePage extends WebDriverPage {
-        /**
-         * Web BasePage default constructor.
-         *
-         * @param driverProvider provide browser driver
-         */
-        public BasePage(final WebDriverProvider driverProvider) {
-            super(driverProvider);
-        }
-
-        @Override
-        public void get(final String url) {
-            super.get(url);
-            final String wait = Resources.base().waitPage();
-            final int seconds = (int) (Double.parseDouble(wait) * 1000);
-            if (seconds > 0) {
-                try {
-                    Thread.sleep(seconds);
-                } catch (InterruptedException e) {
-                    LOG.log(Level.FINE, e.getMessage(), e.getCause());
-                }
-            }
-        }
-    }
 }

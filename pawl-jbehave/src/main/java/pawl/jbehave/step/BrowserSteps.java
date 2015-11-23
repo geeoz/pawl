@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Geeoz Software
+ * Copyright 2015 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,34 +16,31 @@
 
 package pawl.jbehave.step;
 
-import com.google.common.collect.Maps;
 import org.hamcrest.Matchers;
 import org.jbehave.core.annotations.Alias;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import pawl.jbehave.Pages;
 import pawl.util.Resources;
+import pawl.util.WebExpectedConditions;
 
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -55,7 +52,7 @@ import static org.junit.Assert.fail;
  * @author Alex Voloshyn
  * @author Mike Dolinin
  * @author Serge Voloshyn
- * @version 1.12 11/6/2013
+ * @version 1.16 5/2/15
  */
 public final class BrowserSteps extends Matchers {
     /**
@@ -73,19 +70,13 @@ public final class BrowserSteps extends Matchers {
     private transient String url;
 
     /**
-     * Specifies map to store test session data.
-     */
-    private transient Map<String, String> testSessionStore;
-
-    /**
      * Create steps object that contains pages collection.
      *
      * @param pages factory of the page handlers
      */
     public BrowserSteps(final Pages pages) {
         super();
-        this.browser = pages;
-        testSessionStore = Maps.newConcurrentMap();
+        browser = pages;
     }
 
     /**
@@ -95,7 +86,11 @@ public final class BrowserSteps extends Matchers {
      */
     @Given("an '$key' link")
     public void setupLink(final String key) {
-        url = Resources.base().string(key);
+        if (Resources.context().containsKey(key)) {
+            url = Resources.context().get(key);
+        } else {
+            url = Resources.base().string(key);
+        }
     }
 
     /**
@@ -127,38 +122,6 @@ public final class BrowserSteps extends Matchers {
     }
 
     /**
-     * Action to wait some time and then wait for all ajax responses.
-     *
-     * @param sec seconds to wait
-     */
-    @When("I wait '$sec' seconds")
-    @Alias("wait '$sec' seconds")
-    public void wait(final String sec) {
-        final int seconds = (int) (Double.parseDouble(sec) * 1000);
-        if (seconds > 0) {
-            try {
-                Thread.sleep(seconds);
-            } catch (InterruptedException e) {
-                LOG.log(Level.FINE, e.getMessage(), e.getCause());
-            }
-        }
-
-        Object callResult = browser.base().executeScript(
-                "return activeAjaxRequests();");
-        final long sleepTime = 100L;
-        while (callResult != null
-                && Long.parseLong(String.valueOf(callResult)) > 0) {
-            try {
-                Thread.sleep(sleepTime);
-            } catch (final InterruptedException e) {
-                LOG.log(Level.FINE, e.getMessage(), e.getCause());
-            }
-            callResult = browser.base().executeScript(
-                    "return activeAjaxRequests();");
-        }
-    }
-
-    /**
      * Action for click web element.
      *
      * @param identity element identity for search
@@ -166,11 +129,11 @@ public final class BrowserSteps extends Matchers {
     @When("I click '$identity'")
     @Alias("click '$identity'")
     public void click(final String identity) {
-        getVisibleElement(identity).click();
+        browser.base().find(identity).click();
     }
 
     /**
-     * Action for click the web element with XY offsets.
+     * Action for click the web element with XY offsets from center of element.
      *
      * @param identity element identity for search
      * @param xOffset  X-offset for click
@@ -181,10 +144,13 @@ public final class BrowserSteps extends Matchers {
     public void clickWithOffset(final String identity,
                                 final String xOffset,
                                 final String yOffset) {
-        final WebElement webElement = getVisibleElement(identity);
+        final WebElement webElement = browser.base().find(identity);
         final Actions builder = new Actions(browser.base());
-        builder.moveToElement(webElement,
+        builder.moveToElement(webElement).moveByOffset(
                 Integer.parseInt(xOffset), Integer.parseInt(yOffset))
+                // change after
+                // https://code.google.com/p/selenium/issues/detail?id=6141
+                // fixed
                 .click().perform();
     }
 
@@ -199,11 +165,11 @@ public final class BrowserSteps extends Matchers {
     @Alias("choose '$className' with '$value' in '$parentIdentifier'")
     public void choose(final String className, final String value,
                        final String parentIdentifier) {
-        final WebElement parent = getVisibleElement(parentIdentifier);
+        final WebElement parent = browser.base().find(parentIdentifier);
         final List<WebElement> elements
                 = parent.findElements(By.className(className));
         assertThat("Page elements should exists: class name '" + className
-                + "'", elements.size(),
+                        + "'", elements.size(),
                 is(not(equalTo(0))));
 
         for (final WebElement element : elements) {
@@ -228,8 +194,7 @@ public final class BrowserSteps extends Matchers {
         final URL resource = Thread.currentThread().getContextClassLoader()
                 .getResource(fileRelativePath);
         assert resource != null;
-//        fill(identity, resource.getFile());
-        final WebElement element = browser.base().findElement(By.id(identity));
+        final WebElement element = browser.base().find(identity);
 
         if (element.isDisplayed()) {
             element.clear();
@@ -247,65 +212,8 @@ public final class BrowserSteps extends Matchers {
                         + "'}' else '{'document.getElementById(\"{0}\"')'"
                         + ".fireEvent(\"onchange\");'}'",
                 identity, resource.getFile());
-        System.err.println("Put new value script: " + putValue);
+        LOG.warning("Put new value script: " + putValue);
         browser.base().executeScript(putValue);
-    }
-
-    /**
-     * Retrieve an web element that should be visible on current page.
-     *
-     * @param identity an identity of the element
-     * @return a web element that was found
-     */
-    private WebElement getVisibleElement(final String identity) {
-        return browser.base().findElement(getVisibleSelector(identity));
-    }
-
-    /**
-     * Retrieve web elements which may be visible on current page.
-     *
-     * @param identity an identity of the element
-     * @return web elements which were found
-     */
-    private List<WebElement> getVisibleElements(final String identity) {
-        return browser.base().findElements(getVisibleSelector(identity));
-    }
-
-    /**
-     * Retrieve web element selector by different "By" attributes.
-     *
-     * @param identity an identity of the element
-     * @return a selector that has visible state
-     */
-    private By getVisibleSelector(final String identity) {
-        final By[] selectors = {
-                By.id(identity),
-                By.xpath(Resources.base().identityXpath(identity)),
-                By.name(identity),
-                By.className(identity),
-                By.cssSelector(identity),
-                By.xpath(identity)};
-        for (By selector : selectors) {
-            if (isElementDisplayed(selector)) {
-                return selector;
-            }
-        }
-        return selectors[0];
-    }
-
-    /**
-     * Check selector for the displayed state.
-     *
-     * @param selector selector that should be check for displayed state
-     * @return true if selector is displayed
-     */
-    private boolean isElementDisplayed(final By selector) {
-        try {
-            return browser.base().findElement(selector).isDisplayed();
-        } catch (Exception e) {
-            LOG.log(Level.FINE, e.getMessage(), e.getCause());
-        }
-        return false;
     }
 
     /**
@@ -328,9 +236,20 @@ public final class BrowserSteps extends Matchers {
     @When("I fill '$identity' with '$value'")
     @Alias("fill '$identity' with '$value'")
     public void fill(final String identity, final String text) {
-        final WebElement element = getVisibleElement(identity);
-        element.clear();
-        element.sendKeys(getTextFromStorageIfExist(text));
+        String textFromStorageIfExist = getTextFromStorageIfExist(
+                Resources.base().string(text, text));
+        browser.base().find(identity).fillWith(textFromStorageIfExist);
+    }
+
+    /**
+     * Action for press ENTER key.
+     *
+     * @param identity element identity for search
+     */
+    @When("I press ENTER on '$identity'")
+    @Alias("press ENTER on '$identity'")
+    public void pressEnter(final String identity) {
+        browser.base().find(identity).sendKeys(Keys.ENTER);
     }
 
     /**
@@ -342,9 +261,9 @@ public final class BrowserSteps extends Matchers {
     @When("I select '$identity' with '$value'")
     @Alias("select '$identity' with '$value'")
     public void select(final String identity, final String value) {
-        final WebElement element = getVisibleElement(identity);
+        final WebElement element = browser.base().find(identity);
         final Select select = new Select(element);
-        select.selectByVisibleText(value);
+        select.selectByVisibleText(Resources.base().string(value, value));
     }
 
     /**
@@ -354,7 +273,7 @@ public final class BrowserSteps extends Matchers {
      * @return a text from test session store
      */
     private String getTextFromStorageIfExist(final String text) {
-        final String storedText = testSessionStore.get(text);
+        final String storedText = Resources.context().get(text);
         if (storedText != null) {
             return storedText;
         }
@@ -368,8 +287,8 @@ public final class BrowserSteps extends Matchers {
      */
     @Then("I get title '$title'")
     public void verifyTitle(final String title) {
-        assertThat("The page title should be as follow.",
-                browser.base().getTitle(), equalTo(title));
+        browser.base().getWait().until(ExpectedConditions
+                .titleIs(Resources.base().string(title, title)));
     }
 
     /**
@@ -380,8 +299,10 @@ public final class BrowserSteps extends Matchers {
     @Then("I get text '$text'")
     @Alias("text '$text'")
     public void verifySource(final String text) {
-        assertTrue("Page source should contains the text.",
-                browser.base().getPageSource().contains(text));
+        browser.base().getWait().until(
+                ExpectedConditions.textToBePresentInElementLocated(
+                        By.tagName("body"),
+                        Resources.base().string(text, text)));
     }
 
     /**
@@ -393,7 +314,7 @@ public final class BrowserSteps extends Matchers {
     @Alias("'$elementId' element")
     public void verifyElement(final String identity) {
         assertThat("Page element should exists: '" + identity,
-                getVisibleElement(identity),
+                browser.base().find(identity),
                 is(notNullValue()));
     }
 
@@ -406,8 +327,9 @@ public final class BrowserSteps extends Matchers {
     @Then("I get no '$identity' element")
     @Alias("no '$elementId' element")
     public void verifyElementIsNotPresent(final String identity) {
-        assertThat("Page element should not exists: '" + identity,
-                getVisibleElements(identity).size(), is(equalTo(0)));
+        browser.base().getWait().until(
+                ExpectedConditions.invisibilityOfElementLocated(
+                        browser.base().parseBy(identity)));
     }
 
     /**
@@ -420,7 +342,7 @@ public final class BrowserSteps extends Matchers {
     @Alias("'$identity' link")
     public void verifyLink(final String identity) {
         assertThat("Page element should exists: '" + identity,
-                getVisibleElement(identity).getTagName(),
+                browser.base().find(identity).getTagName(),
                 is(equalTo("a")));
     }
 
@@ -433,34 +355,9 @@ public final class BrowserSteps extends Matchers {
     @Then("I get '$identity' with '$text'")
     @Alias("'$identity' with '$text'")
     public void verifyElementText(final String identity, final String text) {
-        final WebElement element = getVisibleElement(identity);
-        assertThat("Page element should exists: '" + identity + "'",
-                element, is(notNullValue()));
-        assertThat(String.format(
-                "Page element '%s' should have text: '%s'", identity, text),
-                getTextFrom(element),
-                is(equalTo(getTextFromStorageIfExist(text))));
-    }
-
-    /**
-     * Retrieve a text from input/textarea/element.
-     *
-     * @param element an element for process
-     * @return text value from input element
-     */
-    private String getTextFrom(final WebElement element) {
-        final String elementTag = element.getTagName();
-        final String elementText;
-        switch (elementTag) {
-            case "input":
-            case "textarea":
-                elementText = element.getAttribute("value");
-                break;
-            default:
-                elementText = element.getText();
-                break;
-        }
-        return elementText;
+        String textFromStorageIfExist = getTextFromStorageIfExist(
+                Resources.base().string(text, text));
+        browser.base().find(identity).shouldHaveText(textFromStorageIfExist);
     }
 
     /**
@@ -472,7 +369,17 @@ public final class BrowserSteps extends Matchers {
      */
     @When("I remember text from '$identity' to '$key' variable")
     public void storeTextFromElement(final String identity, final String key) {
-        testSessionStore.put(key, getTextFrom(getVisibleElement(identity)));
+        Resources.context().put(key, browser.base().find(identity).getText());
+    }
+
+    /**
+     * Delete user session cookie and refresh the page.
+     */
+    @When("user session is expired")
+    public void expireUserSession() {
+        browser.base().manage().deleteCookieNamed(
+                Resources.base().userSessionCookieName());
+        browser.base().navigate().refresh();
     }
 
     /**
@@ -490,31 +397,10 @@ public final class BrowserSteps extends Matchers {
         } else {
             final WebDriverWait wait =
                     new WebDriverWait(driver, Resources.base().explicitWait());
-            newWindow = wait.until(anyWindowOtherThan(opened));
+            newWindow = wait.until(WebExpectedConditions.get()
+                    .anyWindowOtherThan(opened));
         }
         driver.switchTo().window(newWindow);
     }
 
-    /**
-     * Retrieve an any other window than input.
-     *
-     * @param windows windows that should be excluded
-     * @return expected condition result
-     */
-    public static ExpectedCondition<String> anyWindowOtherThan(
-            final Set<String> windows) {
-        return new ExpectedCondition<String>() {
-            public String apply(final WebDriver driver) {
-                if (driver == null) {
-                    throw new WebDriverException();
-                }
-                final Set<String> all = driver.getWindowHandles();
-                all.removeAll(windows);
-                if (all.size() > 0) {
-                    return all.iterator().next();
-                }
-                return null;
-            }
-        };
-    }
 }
