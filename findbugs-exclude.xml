@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   ~ Copyright 2015 Geeoz Software
   ~
@@ -15,11 +16,7 @@
   -->
 
 <FindBugsFilter>
-    <Match>
-        <Source name="~.*\.scala" />
-    </Match>
-    <Match>
-        <Class name="pawl.util.VerifyObjects" />
-        <Method name="verifyMemoryLinksEquality" />
-    </Match>
+  <Match>
+    <Source name="~.*\.scala" />
+  </Match>
 </FindBugsFilter>
