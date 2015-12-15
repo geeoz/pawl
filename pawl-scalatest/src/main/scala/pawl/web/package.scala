@@ -25,4 +25,14 @@ package object web {
   lazy val Firefox = "firefox"
   /** Google Chrome browser. */
   lazy val Chrome = "chrome"
+  /** Mobile emulation configuration key. */
+  lazy val Mobile = "mobile"
+  /** Screen width key. */
+  lazy val Width = "width"
+  /** Screen height key. */
+  lazy val Height = "height"
+  /** Screen pixel ratio key. */
+  lazy val PixelRatio = "pixelRatio"
+  /** Browser user agent key. */
+  lazy val UserAgent = "userAgent"
 }

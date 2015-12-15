@@ -17,11 +17,12 @@
 package pawl
 
 import com.typesafe.config.ConfigException
+import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.scalatest._
 import pawl.web._
-import pawl.web.step.{See, Open, Enter, Click}
+import pawl.web.step.{Click, Enter, Open, See}
 
 /** <code>WebSpec</code> a simple trait for PAWL WEB DSL.
   */
@@ -34,7 +35,9 @@ trait WebSpec extends BaseSpec with BeforeAndAfter with Locators {
   lazy val And = this
 
   /** WebDriver to user based on settings. */
-  implicit val driver = Config.getString(Browser) match {
+  final implicit val driver = initDriver
+
+  protected def initDriver: WebDriver = Config.getString(Browser) match {
     case Firefox => new FirefoxDriver()
     case Chrome => new ChromeDriver()
     case _ =>

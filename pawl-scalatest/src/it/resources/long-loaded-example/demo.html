@@ -18,6 +18,7 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Long loaded page...</title>
 </head>
 <body>
@@ -34,7 +35,7 @@
     (function () {
         setTimeout(function () {
             document.title = 'Page is ready';
-        }, 500);
+        }, 2000);
     })();
 
     function removeElement() {

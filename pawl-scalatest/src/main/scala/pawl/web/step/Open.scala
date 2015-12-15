@@ -16,8 +16,11 @@
 
 package pawl.web.step
 
-import org.openqa.selenium.WebDriver
-import pawl.Step
+import java.awt.Toolkit
+
+import org.openqa.selenium.{Point, WebDriver}
+import pawl._
+import pawl.web._
 
 /** Open web page step.
   * @param url URL to open
@@ -25,7 +28,26 @@ import pawl.Step
   */
 final class Open(url: String)
                 (implicit driver: WebDriver) extends Step[Unit] {
-  override def execute(): Unit = driver get url
+  override def execute(): Unit = {
+    driver get url
+    maximize()
+  }
 
   override def clarification(): Unit = {}
+
+  protected def maximize(): Unit = {
+    Config.getString(Browser) match {
+      case Chrome => maximizeChromeBrowser(driver.manage.window)
+      case _ => driver.manage.window.maximize()
+    }
+  }
+
+  protected def maximizeChromeBrowser(window: WebDriver.Window): Unit = {
+    val toolkit: Toolkit = Toolkit.getDefaultToolkit
+    val screenResolution: org.openqa.selenium.Dimension =
+      new org.openqa.selenium.Dimension(
+        toolkit.getScreenSize.getWidth.toInt, toolkit.getScreenSize.getHeight.toInt)
+    window.setSize(screenResolution)
+    window.setPosition(new Point(0, 0))
+  }
 }
