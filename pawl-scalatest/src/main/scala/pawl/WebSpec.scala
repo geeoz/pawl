@@ -35,7 +35,7 @@ trait WebSpec extends BaseSpec with BeforeAndAfter with Locators {
   lazy val And = this
 
   /** WebDriver to user based on settings. */
-  final implicit val driver = initDriver
+  lazy final implicit val driver = initDriver
 
   protected def initDriver: WebDriver = Config.getString(Browser) match {
     case Firefox => new FirefoxDriver()
