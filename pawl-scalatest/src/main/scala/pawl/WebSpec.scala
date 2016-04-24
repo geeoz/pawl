@@ -16,10 +16,13 @@
 
 package pawl
 
+import java.net.URL
+
 import com.typesafe.config.ConfigException
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.scalatest._
 import pawl.web._
 import pawl.web.step.{Click, Enter, Open, See}
@@ -38,6 +41,8 @@ trait WebSpec extends BaseSpec with BeforeAndAfter with Locators {
   lazy final implicit val driver = initDriver
 
   protected def initDriver: WebDriver = Config.getString(Browser) match {
+    case Firefox if Config.hasPath(Remote) => new RemoteWebDriver(new URL(Config.getString(Remote)), DesiredCapabilities.firefox())
+    case Chrome if Config.hasPath(Remote) => new RemoteWebDriver(new URL(Config.getString(Remote)), DesiredCapabilities.chrome())
     case Firefox => new FirefoxDriver()
     case Chrome => new ChromeDriver()
     case _ =>

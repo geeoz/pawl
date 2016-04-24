@@ -25,6 +25,8 @@ package object web {
   lazy val Firefox = "firefox"
   /** Google Chrome browser. */
   lazy val Chrome = "chrome"
+  /** Remote Selenium grid address. */
+  lazy val Remote = "remote"
   /** Mobile emulation configuration key. */
   lazy val Mobile = "mobile"
   /** Screen width key. */

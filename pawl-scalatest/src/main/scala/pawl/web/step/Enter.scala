@@ -19,7 +19,7 @@ package pawl.web.step
 import org.openqa.selenium.WebDriver
 import org.scalatest.concurrent.Eventually
 import org.scalatest.exceptions.NotAllowedException
-import pawl.Step
+import pawl.WebStep
 import pawl.web.{Context, WebPatience}
 
 /** Enter text to web element.
@@ -28,10 +28,10 @@ import pawl.web.{Context, WebPatience}
   */
 final class Enter(text: String)
                  (implicit driver: WebDriver)
-  extends Step[Context] with Eventually with WebPatience {
+  extends WebStep[Context] with Eventually with WebPatience {
   private val context = new Context()
 
-  override def execute(): Unit = {
+  override def executeWithScreenshot(): Unit = {
     val selector = context.identity
     val by = context.locator.by
     selector match {

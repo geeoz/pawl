@@ -19,7 +19,7 @@ package pawl.web.step
 import org.openqa.selenium.WebDriver
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
-import pawl.Step
+import pawl.WebStep
 import pawl.web.{Context, Locators, WebPatience}
 
 /** Review text in web element.
@@ -28,11 +28,11 @@ import pawl.web.{Context, Locators, WebPatience}
   */
 final class See(text: String)
                (implicit driver: WebDriver)
-  extends Step[Context]
+  extends WebStep[Context]
   with Eventually with WebPatience with Matchers with Locators {
   private val context = new Context()
 
-  override def execute(): Unit = {
+  override def executeWithScreenshot(): Unit = {
     val selector = context.identity
     val by = context.locator.by
     eventually {

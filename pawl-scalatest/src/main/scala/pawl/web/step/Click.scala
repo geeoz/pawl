@@ -18,8 +18,8 @@ package pawl.web.step
 
 import org.openqa.selenium.WebDriver
 import org.scalatest.concurrent.Eventually
-import pawl.Step
-import pawl.web.{WebPatience, Locator, Context}
+import pawl.WebStep
+import pawl.web.{Context, Locator, WebPatience}
 
 /** Click on the web element.
   * @param selector web element identity
@@ -27,10 +27,10 @@ import pawl.web.{WebPatience, Locator, Context}
   */
 final class Click(selector: String)
                  (implicit driver: WebDriver)
-  extends Step[Locator] with Eventually with WebPatience {
+  extends WebStep[Locator] with Eventually with WebPatience {
   private val context = new Context()
 
-  override def execute(): Unit = {
+  override def executeWithScreenshot(): Unit = {
     val by = context.locator.by
     eventually {
       val element = driver.findElement(by.by(selector))
