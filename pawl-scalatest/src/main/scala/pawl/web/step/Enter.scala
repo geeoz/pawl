@@ -20,7 +20,8 @@ import org.openqa.selenium.WebDriver
 import org.scalatest.concurrent.Eventually
 import org.scalatest.exceptions.NotAllowedException
 import pawl.WebStep
-import pawl.web.{Context, WebPatience}
+import pawl.web.WebPatience
+import pawl.web.context.WebContext
 
 /** Enter text to web element.
   * @param text to enter
@@ -28,8 +29,8 @@ import pawl.web.{Context, WebPatience}
   */
 final class Enter(text: String)
                  (implicit driver: WebDriver)
-  extends WebStep[Context] with Eventually with WebPatience {
-  private val context = new Context()
+  extends WebStep[WebContext] with Eventually with WebPatience {
+  private val context = new WebContext()
 
   override def executeWithScreenshot(): Unit = {
     val selector = context.identity
@@ -44,5 +45,5 @@ final class Enter(text: String)
     }
   }
 
-  override def clarification(): Context = context
+  override def clarification(): WebContext = context
 }

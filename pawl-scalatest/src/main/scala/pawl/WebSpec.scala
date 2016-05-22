@@ -25,7 +25,8 @@ import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.scalatest._
 import pawl.web._
-import pawl.web.step.{Click, Enter, Open, See}
+import pawl.web.context.{ResizeContext, StyleContext, WebContext}
+import pawl.web.step._
 
 /** <code>WebSpec</code> a simple trait for PAWL WEB DSL.
   */
@@ -60,11 +61,18 @@ trait WebSpec extends BaseSpec with BeforeAndAfter with Locators {
       add(new Open(url))
     }
 
+    /** Resize browser window.
+      * @param param to change
+      */
+    def resize(param: String): ResizeContext = {
+      add(new Resize(param))
+    }
+
     /** Enters specified text.
       * @param text text for entering
       * @return clarification object
       */
-    def enter(text: String): Context = {
+    def enter(text: String): WebContext = {
       add(new Enter(text))
     }
 
@@ -80,8 +88,16 @@ trait WebSpec extends BaseSpec with BeforeAndAfter with Locators {
       * @param text text for reviewing
       * @return clarification object
       */
-    def see(text: String): Context = {
+    def see(text: String): WebContext = {
       add(new See(text))
+    }
+
+    /** Review specified style.
+      * @param name of style for reviewing
+      * @return clarification object
+      */
+    def style(name: String): StyleContext = {
+      add(new Style(name))
     }
   }
 

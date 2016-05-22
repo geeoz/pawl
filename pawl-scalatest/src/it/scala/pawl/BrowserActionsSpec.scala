@@ -16,14 +16,12 @@
 
 package pawl
 
-import org.scalatest.FlatSpec
-
 /** Actions in browser verification.
   */
-class BrowserActionsSpec extends FlatSpec with WebSpec {
+class BrowserActionsSpec extends WebSpec {
 
   val longLoadedPageUrl =
-    classOf[BrowserActionsSpec] getResource "/long-loaded-example/demo.html" toExternalForm
+    getClass getResource "/long-loaded-example/demo.html" toExternalForm
 
   "Steps" should "wait for elements to be present" in {
     Guest open longLoadedPageUrl
