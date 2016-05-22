@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Geeoz Software
+ * Copyright 2016 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package pawl
+package pawl.web.context
 
-/** Web spec verifications.
+/** Context of the browser resize action.
   */
-class WebSpecSpec extends WebSpec with PropsBundle {
-  val cookiesPageUrl =
-    getClass getResource "/cookies-example/demo.html" toExternalForm
+class ResizeContext {
 
-  "WebSpec" should "fill data into input field" in {
-    Guest open cookiesPageUrl
-    When enter "Johny" into "user-name"
-    And click "add-cookies"
-    Then see johny in "user"
-    And see "Cookies demo"
+  var paramValue: Option[Int] = None
+
+  def to(value: Int): Unit = {
+    paramValue = Some(value)
   }
+
 }

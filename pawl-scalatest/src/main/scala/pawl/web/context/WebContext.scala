@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Geeoz Software
+ * Copyright 2016 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package pawl.web
+package pawl.web.context
+
+import pawl.web.Locator
 
 /** Web context of the action.
   */
-class Context {
+class WebContext {
   var identity: Option[String] = None
   var locator = new Locator
 
