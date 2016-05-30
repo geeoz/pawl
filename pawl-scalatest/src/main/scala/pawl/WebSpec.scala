@@ -24,13 +24,14 @@ import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.scalatest._
+import org.scalatest.words.NotWord
 import pawl.web._
 import pawl.web.context.{ResizeContext, StyleContext, WebContext}
 import pawl.web.step._
 
 /** <code>WebSpec</code> a simple trait for PAWL WEB DSL.
   */
-trait WebSpec extends BaseSpec with BeforeAndAfter with Locators {
+trait WebSpec extends BaseSpec with BeforeAndAfter with Locators with Matchers{
   this: Suite =>
 
   lazy val Guest = this
@@ -99,6 +100,42 @@ trait WebSpec extends BaseSpec with BeforeAndAfter with Locators {
     def style(name: String): StyleContext = {
       add(new Style(name))
     }
+
+    /** Review specified attribute.
+      * @param name of attribute for reviewing
+      * @return clarification object
+      */
+    def attribute(name: String): StyleContext = {
+      add(new Attribute(name))
+    }
+
+    /** Switch to negative actions.
+      * @param notWord negative flag
+      * @return negative web statements
+      */
+    def could(notWord: NotWord): NegativeWebStatement = {
+      new NegativeWebStatement(spec)
+    }
+  }
+
+  class NegativeWebStatement(spec: WebSpec) extends Statement(spec) {
+
+    /** Verify could not see element
+      * @param selector specification of the element to verify
+      * @return clarification object
+      */
+    def see(selector: String): Locator = {
+      add(new NotSee(selector))
+    }
+
+    /** Verify could not click on web element.
+      * @param selector specification of the element to click
+      * @return clarification object
+      */
+    def click(selector: String): Locator = {
+      add(new NotClick(selector))
+    }
+
   }
 
   /** Quits this driver, closing every associated window. */
