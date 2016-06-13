@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Geeoz Software
+ * Copyright 2016 Geeoz Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,41 +16,33 @@
 
 package pawl.web.step
 
-import org.openqa.selenium.WebDriver
+import org.openqa.selenium.{NoSuchElementException, WebDriver}
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import pawl.WebStep
 import pawl.web.context.WebContext
-import pawl.web.{Locators, WebPatience}
+import pawl.web.{Locator, WebPatience}
 
-/** Review text in web element.
-  * @param text to verify
+/** Verify not see web element.
+  * @param selector web element identity
   * @param driver web driver to use
   */
-final class See(text: String)
-               (implicit driver: WebDriver)
-  extends WebStep[WebContext]
-  with Eventually with WebPatience with Matchers with Locators {
+final class NotSee(selector: String)
+                  (implicit driver: WebDriver)
+  extends WebStep[Locator] with Eventually with WebPatience with Matchers {
   private val context = new WebContext()
 
   override def executeWithScreenshot(): Unit = {
-    val selector = context.identity
     val by = context.locator.by
     eventually {
-      selector match {
-        case Some(s) if title.equals(s) => driver.getTitle should be(text)
-        case Some(s) =>
-          val element = driver.findElement(by.by(s))
-          element should be ('displayed)
-          element.getTagName match {
-            case "input" | "textarea" =>
-              element getAttribute "value" should be(text)
-            case _ => element.getText should be(text)
-          }
-        case None => driver.getPageSource should include(text)
+      try {
+        val element = driver.findElement(by.by(selector))
+        element should not be 'displayed
+      } catch {
+        case e: NoSuchElementException => Unit
       }
     }
   }
 
-  override def clarification(): WebContext = context
+  override def clarification(): Locator = context.locator
 }

@@ -45,6 +45,12 @@ class BrowserActionsSpec extends WebSpec {
     When click "reload-button"
     And click "new-reloaded-button"
     Then see "new reloaded button" in "new-reloaded-button"
+    // Negative actions
+    And could not see "hidden-button"
+    And could not see "no-button"
+    And could not click "disabled-button" by id
+    And could not click "hidden-button" by id
+    And could not click "no-button" by id
   }
 
 }
