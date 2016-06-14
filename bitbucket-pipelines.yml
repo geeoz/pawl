@@ -1,0 +1,7 @@
+image: staryy/firefox-ubuntu:39.0
+
+pipelines:
+  default:
+    - step:
+        script:
+          - sbt it:build
