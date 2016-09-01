@@ -19,7 +19,7 @@ import sbt._
 
 object Dependencies {
   val Scala = Seq(
-    scalaVersion := "2.11.7"
+    scalaVersion := "2.11.8"
   )
 
   // Typesafe Config Factory

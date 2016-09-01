@@ -17,15 +17,19 @@
 import sbt.Keys._
 import sbt._
 
-object Maven {
+object Publish {
   lazy val settings = Seq(
     resolvers := {
       val localMaven = Resolver.mavenLocal
-      localMaven +: resolvers.value
+      localMaven +: Resolver.jcenterRepo +: resolvers.value
     },
+    publishTo :=
+      Some("Bintray API Realm" at s"https://api.bintray.com/content/geeoz/mvn/${organization.value}/${version.value}"),
+    credentials += Credentials(
+      "Bintray API Realm", "api.bintray.com", sys.env.get("BINTRAY_USER").orNull, sys.env.get("BINTRAY_KEY").orNull),
     publishArtifact in Test := false,
     pomExtra :=
-        <url>https://bitbucket.org/geeoz/pawl</url>
+        <url>https://github.com/geeoz/pawl</url>
 
         <licenses>
           <license>
@@ -62,9 +66,9 @@ object Maven {
         </developers>
 
         <scm>
-          <connection>scm:git:ssh://git@bitbucket.org/geeoz/pawl</connection>
-          <developerConnection>scm:git:ssh://git@bitbucket.org/geeoz/pawl</developerConnection>
-          <url>https://bitbucket.org/geeoz/pawl</url>
+          <connection>scm:git:ssh://git@github.com/geeoz/pawl</connection>
+          <developerConnection>scm:git:ssh://git@github.com/geeoz/pawl</developerConnection>
+          <url>https://github.com/geeoz/pawl</url>
         </scm>
   )
 }
