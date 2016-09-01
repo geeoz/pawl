@@ -1,9 +1,23 @@
+sudo: false
+
+addons:
+  firefox: "39.0"
+
 language: scala
-scala:
-- 2.11.7
-jdk:
-- oraclejdk8
-script: sbt ++$TRAVIS_SCALA_VERSION build
+matrix:
+  include:
+  - scala: "2.11.8"
+    jdk: oraclejdk8
+    script:
+      - sbt ';compile;test;package'
+    after_success: ./project/travis-ci-bintray-deploy.sh
+
 notifications:
   slack:
     secure: Y2G6IeDaDnTaJY7d5xObje7IbNV70aPztrljmMboPNiWI8eyjzrEMLYhqAJgY3cEKBlZSHMyy6TB7vHEEL9ugSOEPCOyKaGjEMhSRn6RT/9XnBa2lfkctuv5cZBZvkW7CZ+Fea61SP80ZUmlZWpfNO9lvYg4/w2lqoN92Mi0qCPc/ZlBRMWFMc0Jkc0Ph6ByEp8MhwdOON3SCUHjxHkbOKl1B141rlhuusDKh7rmBwRuCj0fH/iZ2W4fijMdWolc7D0JN43UqUoHJYsopGr8pCmlU++5skukV/RUfLwE3YOsCrV07mtiGlINRERdJAOrC2UtMkptqHn710MDnEAPwC9OFFfzh7Xe02w+iGNW7FTPwHhrDv1nxX1+z0uBK8QiuKJFkHa26hbMh7PpVv4MQJZUtF1z6d20KVU9L7MkSVgbniuD6MOy1N6BvJZCZWndaUjleUp1zbTJbqSVhLXWRPZVQfGworsCy8EoqGWjx6/h+kd23THjE5WruT78peHhmyJniaAYdJVPZuCOgNWNmsK6zsOFsd3trt7d9/4UtwmqybC4GrRNG9ZHFLWE6seaiC3bSdt+8wumZuVNGlcwqkFAq60OpRGflAy8lOzlKAXHCz+zO85mV6x7UfNvC3Sc5zwmxoQb18RABFZvLWTrpEJyWh6fcKgPSK6czo7CKz4=
+
+cache:
+  directories:
+    - $HOME/.m2/repository
+    - $HOME/.sbt/boot
+    - $HOME/.ivy2/cache

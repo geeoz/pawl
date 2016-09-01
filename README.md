@@ -17,7 +17,7 @@ This will build the library, publish it to a local artifactory repository, then 
 ###Requirements
 
 - [Java JDK (1.8+)] [java]
-- [SBT (0.13.9+)] [sbt]
+- [SBT (0.13.12+)] [sbt]
 - [PhantomJS (2.0.0+)] [phantom]
 
 ###Steps
