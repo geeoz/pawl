@@ -1,12 +1,17 @@
 sudo: false
 
+before_install:
+  - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in .travis.secring.asc.enc -out local.secring.asc -d
+  - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in .travis.pubring.asc.enc -out local.pubring.asc -d
+
 addons:
-  firefox: "39.0"
+  firefox: '39.0'
 
 language: scala
+
 matrix:
   include:
-  - scala: "2.11.8"
+  - scala: 2.11.8
     jdk: oraclejdk8
     script:
       - sbt ';compile;test;package'
@@ -16,8 +21,16 @@ notifications:
   slack:
     secure: Y2G6IeDaDnTaJY7d5xObje7IbNV70aPztrljmMboPNiWI8eyjzrEMLYhqAJgY3cEKBlZSHMyy6TB7vHEEL9ugSOEPCOyKaGjEMhSRn6RT/9XnBa2lfkctuv5cZBZvkW7CZ+Fea61SP80ZUmlZWpfNO9lvYg4/w2lqoN92Mi0qCPc/ZlBRMWFMc0Jkc0Ph6ByEp8MhwdOON3SCUHjxHkbOKl1B141rlhuusDKh7rmBwRuCj0fH/iZ2W4fijMdWolc7D0JN43UqUoHJYsopGr8pCmlU++5skukV/RUfLwE3YOsCrV07mtiGlINRERdJAOrC2UtMkptqHn710MDnEAPwC9OFFfzh7Xe02w+iGNW7FTPwHhrDv1nxX1+z0uBK8QiuKJFkHa26hbMh7PpVv4MQJZUtF1z6d20KVU9L7MkSVgbniuD6MOy1N6BvJZCZWndaUjleUp1zbTJbqSVhLXWRPZVQfGworsCy8EoqGWjx6/h+kd23THjE5WruT78peHhmyJniaAYdJVPZuCOgNWNmsK6zsOFsd3trt7d9/4UtwmqybC4GrRNG9ZHFLWE6seaiC3bSdt+8wumZuVNGlcwqkFAq60OpRGflAy8lOzlKAXHCz+zO85mV6x7UfNvC3Sc5zwmxoQb18RABFZvLWTrpEJyWh6fcKgPSK6czo7CKz4=
 
+before_cache:
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt -name "*.lock" -delete
+
 cache:
   directories:
-    - $HOME/.m2/repository
-    - $HOME/.sbt/boot
-    - $HOME/.ivy2/cache
+  - $HOME/.m2/repository
+  - $HOME/.sbt/boot
+  - $HOME/.ivy2/cache
+
+env:
+  global:
+    secure: Q3Cu/FlIOJmW0P7G+2zVWJHbs1gl/rS5IXP6h34nFiAN63DG7XZrjvY3Jgdl5ZfAJyM+SczaLVYyQ6wmIe4zqjZA9BaEIjRAAHeyIj9nV76oKGh6Asai4DfoughOiUpe8WSfvdFd7IJ358sX4/TPjhgDRG0qckWucSS9wggnF9LcwulLjTxuF0zFHN04FL1Jtmk/GltSHz1GJ+abBGTqVMK77SyPlM+MqCfot3EAQD/2zHMZvOLJ6VZkF7zknsuQCCvEhckbm02XaSl6EIFuWdu5xnSDY6FXiANmHgLt+oYbKkrLHiAJI7/AwsRzs+jZTE+VPZjw9gFcbtuLKdwTzmLAC7quPRDIVaHaNhojo8KwC6pMoMm0W4IDSVi7XARYB0zvbqFajQaYF77Je5j61slKj1+CZtO6+jvUoT5zEwyGDzc+1u7IL7rWq44EgD0KUVzeXjT/92P00Mu3ZpfnnEXFKAQyCl7UmKY1mv+NcLR4+fxEh7bv1R97+PB0VblRrtG6tIjm9AG3rPKp8s5wUg6e6q5PPGFZE1KC52cIeqVpdViTeMIIEY6zIDB1yRPncduHeaXVA9NfKu4WcKwK9RQd+pQaOSbPc/Qfg/mY8TbeKUITXE9ATP8rnNomi2yhdamttxB4wCg+KRRpy1NjjAyPiyCgoRmg4W0PG/kolk0=

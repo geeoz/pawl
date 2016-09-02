@@ -16,17 +16,22 @@
 
 import sbt.Keys._
 import sbt._
+import com.typesafe.sbt.SbtPgp.autoImport._
 
 object Publish {
   lazy val settings = Seq(
     resolvers := {
       val localMaven = Resolver.mavenLocal
-      localMaven +: Resolver.jcenterRepo +: resolvers.value
+      localMaven +: resolvers.value
     },
-    publishTo :=
-      Some("Bintray API Realm" at s"https://api.bintray.com/content/geeoz/mvn/${organization.value}/${version.value}"),
     credentials += Credentials(
-      "Bintray API Realm", "api.bintray.com", sys.env.get("BINTRAY_USER").orNull, sys.env.get("BINTRAY_KEY").orNull),
+      "Sonatype Nexus Repository Manager",
+      "oss.sonatype.org",
+      sys.env.getOrElse("SONATYPE_USER", ""),
+      sys.env.getOrElse("SONATYPE_KEY", "")),
+    pgpSecretRing := file("local.secring.asc"),
+    pgpPublicRing := file("local.pubring.asc"),
+    pgpPassphrase := Some(sys.env.getOrElse("PGP_PASSPHRASE", "").toCharArray),
     publishArtifact in Test := false,
     pomExtra :=
         <url>https://github.com/geeoz/pawl</url>
