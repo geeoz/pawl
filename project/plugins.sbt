@@ -28,6 +28,10 @@ addSbtPlugin("com.geeoz.sbt" % "sbt-pmd" % "0.1.0")
 addSbtPlugin("org.xerial.sbt" % "sbt-jcheckstyle" % "0.1.2")
 
 // -- RELEASE --
+// A sbt plugin for publishing your project to the Maven central repository through the REST API
+// of Sonatype Nexus.
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "1.1")
+
 
 // The sbt-pgp plugin provides PGP signing for SBT.
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")

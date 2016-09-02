@@ -21,12 +21,11 @@ object Publish {
   lazy val settings = Seq(
     resolvers := {
       val localMaven = Resolver.mavenLocal
-      localMaven +: Resolver.jcenterRepo +: resolvers.value
+      localMaven +: resolvers.value
     },
-    publishTo :=
-      Some("Bintray API Realm" at s"https://api.bintray.com/content/geeoz/mvn/${organization.value}/${version.value}"),
     credentials += Credentials(
-      "Bintray API Realm", "api.bintray.com", sys.env.get("BINTRAY_USER").orNull, sys.env.get("BINTRAY_KEY").orNull),
+      "Sonatype Nexus Repository Manager", "oss.sonatype.org", sys.env.get("SONATYPE_USER").orNull, sys.env.get("SONATYPE_KEY").orNull),
+
     publishArtifact in Test := false,
     pomExtra :=
         <url>https://github.com/geeoz/pawl</url>
