@@ -32,7 +32,6 @@ addSbtPlugin("org.xerial.sbt" % "sbt-jcheckstyle" % "0.1.2")
 // of Sonatype Nexus.
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "1.1")
 
-
 // The sbt-pgp plugin provides PGP signing for SBT.
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")
 
