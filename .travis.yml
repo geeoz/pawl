@@ -15,7 +15,7 @@ matrix:
     jdk: oraclejdk8
     script:
       - sbt ';compile;test;package'
-    after_success: ./project/travis-ci-bintray-deploy.sh
+    after_success: ./project/travis-ci-sonatype-deploy.sh
 
 notifications:
   slack:
