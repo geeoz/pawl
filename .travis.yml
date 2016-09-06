@@ -9,12 +9,17 @@ addons:
 
 language: scala
 
+before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
+
 matrix:
   include:
   - scala: 2.11.8
     jdk: oraclejdk8
     script:
-      - sbt ';compile;test;package'
+      - sbt ';compile;test;package;it:test'
     after_success: ./project/travis-ci-sonatype-deploy.sh
 
 notifications:
