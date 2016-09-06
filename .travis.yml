@@ -1,8 +1,8 @@
 sudo: false
 
 before_install:
-  - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in .travis.secring.asc.enc -out local.secring.asc -d
-  - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in .travis.pubring.asc.enc -out local.pubring.asc -d
+  - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in ./project/travis/travis.secring.asc.enc -out local.secring.asc -d
+  - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in ./project/travis/travis.pubring.asc.enc -out local.pubring.asc -d
 
 addons:
   firefox: '39.0'
@@ -20,7 +20,8 @@ matrix:
     jdk: oraclejdk8
     script:
       - sbt ';compile;test;package;it:test'
-    after_success: ./project/travis-ci-sonatype-deploy.sh
+    after_success: ./project/travis/travis-ci-sonatype-deploy.sh
+    after_failure: ./project/travis/tarvis-ci-yandex-logs-upload.sh
 
 notifications:
   slack:
