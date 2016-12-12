@@ -1,4 +1,4 @@
-sudo: false
+sudo: required
 
 before_install:
   - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in ./project/travis/travis.secring.asc.enc -out local.secring.asc -d
