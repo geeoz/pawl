@@ -29,7 +29,7 @@ object Dependencies {
   // ScalaTest
   val scalaTestVersion      = "3.0.0-SNAP6"   // ApacheV2
   // Browser automation framework
-  val seleniumVersion       = "2.53.0"        // ApacheV2
+  val seleniumVersion       = "3.0.1"        // ApacheV2
 
   object Compile {
     val config              = "com.typesafe" % "config" % configVersion
