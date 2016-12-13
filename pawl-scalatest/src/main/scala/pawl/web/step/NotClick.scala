@@ -16,7 +16,7 @@
 
 package pawl.web.step
 
-import org.openqa.selenium.{ElementNotVisibleException, NoSuchElementException, WebDriver}
+import org.openqa.selenium.{ElementNotVisibleException, InvalidElementStateException, NoSuchElementException, WebDriver}
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import pawl.WebStep
@@ -40,8 +40,9 @@ final class NotClick(selector: String)
         element click()
         element should not be 'enabled
       } catch {
-        case e: NoSuchElementException => Unit
-        case e: ElementNotVisibleException => Unit
+        case _: NoSuchElementException => Unit
+        case _: ElementNotVisibleException => Unit
+        case _: InvalidElementStateException => Unit
       }
     }
   }

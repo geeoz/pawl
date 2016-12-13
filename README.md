@@ -18,6 +18,7 @@ This will build the library, publish it to a local artifactory repository, then 
 
 - [Java JDK (1.8+)] [java]
 - [SBT (0.13.12+)] [sbt]
+- [geckodriver (0.11.1+)] [geckodriver]
 - [PhantomJS (2.0.0+)] [phantom]
 
 ###Steps
@@ -51,4 +52,5 @@ More assistance can be found in our documentation and our [developer hub] [dev-h
 [dev-hub]: http://developer.geeoz.com "Geeoz Developer Hub"
 [java]: http://www.oracle.com/technetwork/java/javase/downloads/index.html "Java"
 [sbt]: http://www.scala-sbt.org "SBT"
+[geckodriver]: https://github.com/mozilla/geckodriver
 [phantom]: http://phantomjs.org/ "PhantomJS"
