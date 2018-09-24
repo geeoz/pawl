@@ -16,7 +16,7 @@ before_install:
 
 matrix:
   include:
-  - scala: 2.11.8
+  - scala: 2.12.4
     jdk: oraclejdk8
     script:
       - sbt ';compile;test;package;it:test'
