@@ -1,27 +1,27 @@
-#PAWL
+# PAWL
 
 This project contains one component:
 
 - pawl: A project to aid with test automation.
 
 
-##Downloading
+## Downloading
 The output jars are hosted in Maven Central:
 
     group: com.geeoz.pawl
     artifact: pawl
 
-##Building the Library
+## Building the Library
 This will build the library, publish it to a local artifactory repository, then resolve the dependencies of the project. 
 
-###Requirements
+### Requirements
 
 - [Java JDK (1.8+)] [java]
 - [SBT (0.13.12+)] [sbt]
 - [geckodriver (0.11.1+)] [geckodriver]
 - [PhantomJS (2.0.0+)] [phantom]
 
-###Steps
+### Steps
 
 1. Download the source code from git: `git clone git@bitbucket.org:geeoz/pawl.git`
 2. Open a command line in the cloned directory: `cd ./pawl`
