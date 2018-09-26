@@ -66,7 +66,7 @@ lazy val pawl = (project in file(".")).
 
 lazy val `pawl-scalatest` = (project in file("pawl-scalatest")).
   configs(IntegrationTest).
-//  enablePlugins(PawlPlugin).
+  enablePlugins(PawlPlugin).
   settings(buildSettings: _*).
   settings(
     name := "pawl-scalatest",

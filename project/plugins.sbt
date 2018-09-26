@@ -8,7 +8,7 @@
 //addSbtPlugin("com.github.sdb" % "xsbt-filter" % "0.4")
 
 // This plugin generates all necessary utility classes for PAWL Framework.
-//addSbtPlugin("com.geeoz.sbt" % "sbt-pawl" % "0.2.2")
+addSbtPlugin("com.geeoz.sbt" % "sbt-pawl" % "0.2.4-SNAPSHOT")
 
 // -- CODE STYLE --
 // Sbt plugin for checking Scala code styles with checkstyle.
