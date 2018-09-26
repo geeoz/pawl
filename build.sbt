@@ -72,7 +72,6 @@ lazy val `pawl-scalatest` = (project in file("pawl-scalatest")).
     name := "pawl-scalatest",
     description := "Test suite for performing integration tests.",
     mainDirectory := baseDirectory.value.getParentFile,
-    Defaults.itSettings,
     Dependencies.pawlScalaTest,
     // FIXME update Scalastyle plugin
     sca := {}
