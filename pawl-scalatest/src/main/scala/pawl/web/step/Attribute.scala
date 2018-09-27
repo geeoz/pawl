@@ -45,9 +45,9 @@ final class Attribute(attributeName: String)
           element.toString
           withClue(s"For element $element attribute $attributeName ") {
             textValue match {
-              case Some(t) if name == "tag" => element.getTagName should be(t)
+              case Some(t) if attributeName == "tag" => element.getTagName should be(t)
               case Some(t) => element getAttribute attributeName should be(t)
-              case None if name == "tag" => throw new NotAllowedException(
+              case None if attributeName == "tag" => throw new NotAllowedException(
                 s"For element $element please define tag name.", 0)
               case None => element getAttribute attributeName should not be empty
             }
