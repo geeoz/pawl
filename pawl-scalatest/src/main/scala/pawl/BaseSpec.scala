@@ -47,13 +47,14 @@ trait BaseSpec extends FlatSpec with BeforeAndAfterEach with Bundle {
     }
   }
 
-  /** Check that all steps where executed.
+  /** Execute last step if previous not failed.
     */
-  override protected def afterEach(): Unit = {
-    super.afterEach()
-    if (scenario.nonEmpty) {
-      scenario foreach (_.execute())
-      scenario clear()
+  override def withFixture(test: NoArgTest): Outcome = {
+    super.withFixture(test) match {
+      case Succeeded =>
+        scenario foreach (_.execute())
+        Succeeded
+      case any: Any => any
     }
   }
 }

@@ -140,8 +140,8 @@ trait WebSpec extends BaseSpec with Locators with Matchers {
 
   /** Quits this driver, closing every associated window. */
   override protected def afterEach(): Unit = {
-    super.afterEach()
-    driver.quit()
+    try super.afterEach()
+    finally driver.quit()
   }
 
 }
