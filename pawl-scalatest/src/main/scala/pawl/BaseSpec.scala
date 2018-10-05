@@ -27,6 +27,14 @@ trait BaseSpec extends FlatSpec with BeforeAndAfterEach with Bundle {
   /** Array of the steps for execution */
   private lazy val scenario = ArrayBuffer[Step[_]]()
 
+  private def executeScenario = {
+    if (scenario.nonEmpty) {
+      scenario foreach (_.execute())
+      scenario clear()
+    }
+    Succeeded
+  }
+
   /** Base statement class for DSL.
     * @param spec specification that runs
     */
@@ -38,10 +46,7 @@ trait BaseSpec extends FlatSpec with BeforeAndAfterEach with Bundle {
       * @return step clarification object
       */
     protected def add[T](s: Step[T]): T = {
-      if (scenario.nonEmpty) {
-        scenario foreach (_.execute())
-        scenario clear()
-      }
+      executeScenario
       scenario += s
       s.clarification()
     }
@@ -49,12 +54,9 @@ trait BaseSpec extends FlatSpec with BeforeAndAfterEach with Bundle {
 
   /** Execute last step if previous not failed.
     */
-  override def withFixture(test: NoArgTest): Outcome = {
+  override def withFixture(test: NoArgTest): Outcome =
     super.withFixture(test) match {
-      case Succeeded =>
-        scenario foreach (_.execute())
-        Succeeded
-      case any: Any => any
+      case Succeeded => executeScenario
+      case any: Outcome => any
     }
-  }
 }
