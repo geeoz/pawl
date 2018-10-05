@@ -15,7 +15,7 @@ addSbtPlugin("com.geeoz.sbt" % "sbt-pawl" % "0.2.4")
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
 
 // Sbt plugin that integrates the scala static code analysis library.
-addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "1.0.7")
+addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "1.0.9")
 
 // Sbt findbugs plugin.
 addSbtPlugin("com.github.sbt" % "sbt-findbugs" % "2.0.0")
