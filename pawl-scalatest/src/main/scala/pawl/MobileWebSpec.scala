@@ -19,7 +19,6 @@ package pawl
 import com.typesafe.config.ConfigException
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
-import org.openqa.selenium.remote.DesiredCapabilities
 import org.scalatest.Suite
 import pawl.web._
 
@@ -38,10 +37,9 @@ trait MobileWebSpec extends WebSpec {
         PixelRatio -> mobileConf.getDouble(PixelRatio))
       val mobileEmulation = Map("deviceMetrics" -> deviceMetrics.asJava,
         UserAgent -> mobileConf.getString(UserAgent))
-      val chromeOptions = Map("mobileEmulation" -> mobileEmulation.asJava)
-      val capabilities = DesiredCapabilities.chrome()
-      capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions.asJava)
-      new ChromeDriver(capabilities)
+      val chromeOptions = new ChromeOptions()
+      chromeOptions.setExperimentalOption("mobileEmulation", mobileEmulation.asJava)
+      new ChromeDriver(chromeOptions)
     case _ =>
       throw new ConfigException.BadValue(Browser, Config.getString(Browser))
   }
