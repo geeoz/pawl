@@ -36,6 +36,6 @@ class WebFontsSpec extends WebSpec with PropsBundle {
     And style "font-size" is "20px" in "test-div"
     When resize Width to 1200
     Then style "font-size" is "20px" in "test-h1"
-    And style "font-size" is "40px" in "test-div"
+    And style "font-size" is "600px" in "test-div"
   }
 }
