@@ -23,7 +23,7 @@ class WebSpecSpec extends WebSpec with PropsBundle {
     getClass getResource "/cookies-example/demo.html" toExternalForm
 
   "WebSpec" should "fill data into input field" in {
-    Guest open cookiesPageUrl
+    Guest open "http://127.0.0.1:8080/cookies-example/demo.html"
     When enter "Johny" into "user-name"
     And click "add-cookies"
     Then see johny in "user"

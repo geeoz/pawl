@@ -14,6 +14,8 @@ language: scala
 
 before_install:
   - docker info
+  - docker pull danjellz/http-server
+  - docker run -d -p 8080:8080 -v $(PWD)/pawl-scalatest/src/it/resources:/public danjellz/http-server
   - curl -s https://aerokube.com/cm/bash | bash
   - ./cm selenoid start --vnc --args "-limit 2"
   - docker logs selenoid
