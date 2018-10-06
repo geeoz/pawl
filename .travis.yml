@@ -17,7 +17,7 @@ before_install:
   - if [[ -d $HOME/docker ]]; then ls $HOME/docker/*.tar.gz | xargs -I {file} sh -c "zcat {file} | docker load"; fi
   - docker info
   - docker pull danjellz/http-server
-  - docker run -d -p 8080:8080 -v $PWD/pawl-scalatest/src/it/resources:/public danjellz/http-server
+  - docker run --name web -d -p 8080:8080 -v $PWD/pawl-scalatest/src/it/resources:/public danjellz/http-server
   - curl -s https://aerokube.com/cm/bash | bash
   - ./cm selenoid start --vnc --args "-limit 2"
   - docker logs selenoid

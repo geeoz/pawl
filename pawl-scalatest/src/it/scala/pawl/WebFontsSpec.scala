@@ -25,7 +25,7 @@ class WebFontsSpec extends WebSpec with PropsBundle {
     getClass getResource "/fonts-example/demo.html" toExternalForm
 
   "Fonts" should "change acording to browser width" in {
-    Guest open "http://127.0.0.1:8080/fonts-example/demo.html"
+    Guest open "http://web:8080/fonts-example/demo.html"
     Then see "Heading Heading Heading" in "test-h1"
     And style "font-size" is "30px" in "test-h1"
     And style "font-size" is "60px" in "test-div"

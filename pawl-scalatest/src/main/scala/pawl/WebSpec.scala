@@ -44,7 +44,10 @@ trait WebSpec extends BaseSpec with Locators with Matchers {
 
   protected def initDriver: WebDriver = Config.getString(Browser) match {
     case Firefox if Config.hasPath(Remote) => new RemoteWebDriver(new URL(Config.getString(Remote)), DesiredCapabilities.firefox())
-    case Chrome if Config.hasPath(Remote) => new RemoteWebDriver(new URL(Config.getString(Remote)), DesiredCapabilities.chrome())
+    case Chrome if Config.hasPath(Remote) =>
+      val capabilities = DesiredCapabilities.chrome()
+      capabilities.setCapability("applicationContainers", {"web"})
+      new RemoteWebDriver(new URL(Config.getString(Remote)), capabilities)
     case Firefox => new FirefoxDriver()
     case Chrome => new ChromeDriver()
     case _ =>

@@ -24,7 +24,7 @@ class BrowserActionsSpec extends WebSpec {
     getClass getResource "/long-loaded-example/demo.html" toExternalForm
 
   "Steps" should "wait for elements to be present" in {
-    Guest open "http://127.0.0.1:8080/long-loaded-example/demo.html"
+    Guest open "http://web:8080/long-loaded-example/demo.html"
     Then see "Long loaded page..." in title
     Then see "Page is ready" in title
     // verify wait element to click
