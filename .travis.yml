@@ -13,6 +13,8 @@ addons:
 language: scala
 
 before_install:
+  # Load cached docker images
+  - if [[ -d $HOME/docker ]]; then ls $HOME/docker/*.tar.gz | xargs -I {file} sh -c "zcat {file} | docker load"; fi
   - docker info
   - docker pull danjellz/http-server
   - docker run -d -p 8080:8080 -v $PWD/pawl-scalatest/src/it/resources:/public danjellz/http-server
@@ -42,10 +44,17 @@ before_cache:
   - find $HOME/.sbt -name "*.lock" -delete
 
 cache:
+  bundler: true
   directories:
   - $HOME/.m2/repository
   - $HOME/.sbt/boot
   - $HOME/.ivy2/cache
+  - $HOME/docker
+before_cache:
+# Save tagged docker images
+- >
+  mkdir -p $HOME/docker && docker images -a --filter='dangling=false' --format '{{.Repository}}:{{.Tag}} {{.ID}}'
+  | xargs -n 2 -t sh -c 'test -e $HOME/docker/$1.tar.gz || docker save $0 | gzip -2 > $HOME/docker/$1.tar.gz'
 
 env:
   global:
