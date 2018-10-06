@@ -1,5 +1,8 @@
 sudo: required
 
+services:
+- docker
+
 before_install:
   - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in ./project/travis/travis.secring.asc.enc -out local.secring.asc -d
   - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in ./project/travis/travis.pubring.asc.enc -out local.pubring.asc -d
@@ -10,6 +13,11 @@ addons:
 language: scala
 
 before_install:
+  - docker info
+  - curl -s https://aerokube.com/cm/bash | bash
+  - ./cm selenoid start --vnc
+  - docker ps
+  - curl http://localhost:4444/wd/hub
   - "export DISPLAY=:99.0"
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x16"
   - ./project/travis/install-geckodriver.sh
