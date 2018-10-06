@@ -29,6 +29,8 @@ import pawl.web._
 import pawl.web.context.{ResizeContext, StyleContext, WebContext}
 import pawl.web.step._
 
+import scala.collection.JavaConverters._
+
 /** <code>WebSpec</code> a simple trait for PAWL WEB DSL.
   */
 trait WebSpec extends BaseSpec with Locators with Matchers {
@@ -46,7 +48,7 @@ trait WebSpec extends BaseSpec with Locators with Matchers {
     case Firefox if Config.hasPath(Remote) => new RemoteWebDriver(new URL(Config.getString(Remote)), DesiredCapabilities.firefox())
     case Chrome if Config.hasPath(Remote) =>
       val capabilities = DesiredCapabilities.chrome()
-      capabilities.setCapability("applicationContainers", List("web"))
+      capabilities.setCapability("applicationContainers", Array("web"))
       new RemoteWebDriver(new URL(Config.getString(Remote)), capabilities)
     case Firefox => new FirefoxDriver()
     case Chrome => new ChromeDriver()
