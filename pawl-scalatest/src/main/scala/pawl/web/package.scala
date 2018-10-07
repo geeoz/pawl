@@ -27,6 +27,8 @@ package object web {
   lazy val Chrome = "chrome"
   /** Remote Selenium grid address. */
   lazy val Remote = "remote"
+  /** Desktop browsers configuration key. */
+  lazy val Desktop = "desktop"
   /** Mobile emulation configuration key. */
   lazy val Mobile = "mobile"
   /** Screen width key. */

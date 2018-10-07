@@ -18,10 +18,9 @@ package pawl.web.step
 
 import java.awt.Toolkit
 
-import org.openqa.selenium.{Point, WebDriver}
-import pawl.Config
-import pawl.WebStep
+import org.openqa.selenium.WebDriver
 import pawl.web._
+import pawl.{Config, WebStep}
 
 /** Open web page step.
   * @param url URL to open
@@ -31,7 +30,9 @@ final class Open(url: String)
                 (implicit driver: WebDriver) extends WebStep[Unit] {
   override def executeWithScreenshot(): Unit = {
     driver get url
-    maximize()
+    val desktopConf = Config.getConfig(Desktop)
+    val dimension = new org.openqa.selenium.Dimension(desktopConf.getInt(Width), desktopConf.getInt(Height))
+    driver.manage().window().setSize(dimension)
   }
 
   override def clarification(): Unit = {}
