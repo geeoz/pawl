@@ -20,16 +20,14 @@ import java.net.URL
 
 import com.typesafe.config.ConfigException
 import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.firefox.FirefoxDriver
-import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
+import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
+import org.openqa.selenium.firefox.{FirefoxDriver, FirefoxOptions}
+import org.openqa.selenium.remote.RemoteWebDriver
 import org.scalatest._
 import org.scalatest.words.NotWord
 import pawl.web._
 import pawl.web.context.{ResizeContext, StyleContext, WebContext}
 import pawl.web.step._
-
-import scala.collection.JavaConverters._
 
 /** <code>WebSpec</code> a simple trait for PAWL WEB DSL.
   */
@@ -45,11 +43,11 @@ trait WebSpec extends BaseSpec with Locators with Matchers {
   lazy final implicit val driver = initDriver
 
   protected def initDriver: WebDriver = Config.getString(Browser) match {
-    case Firefox if Config.hasPath(Remote) => new RemoteWebDriver(new URL(Config.getString(Remote)), DesiredCapabilities.firefox())
+    case Firefox if Config.hasPath(Remote) => new RemoteWebDriver(new URL(Config.getString(Remote)), new FirefoxOptions())
     case Chrome if Config.hasPath(Remote) =>
-      val capabilities = DesiredCapabilities.chrome()
-      capabilities.setCapability("applicationContainers", Array("web"))
-      new RemoteWebDriver(new URL(Config.getString(Remote)), capabilities)
+      val options = new ChromeOptions()
+      options.setCapability("applicationContainers", Array("web"))
+      new RemoteWebDriver(new URL(Config.getString(Remote)), options)
     case Firefox => new FirefoxDriver()
     case Chrome => new ChromeDriver()
     case _ =>

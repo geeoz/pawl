@@ -38,7 +38,7 @@ final class Open(url: String)
 
   protected def maximize(): Unit = {
     Config.getString(Browser) match {
-      case Chrome => maximizeChromeBrowser(driver.manage.window)
+      case Chrome if !Config.hasPath(Remote) => maximizeChromeBrowser(driver.manage.window)
       case _ => driver.manage.window.maximize()
     }
   }
