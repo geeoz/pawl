@@ -25,10 +25,10 @@ import pawl.web.context.StyleContext
 import pawl.web.{Locators, WebPatience}
 
 /** Review attribute in web element.
-  * @param name   of attribute to verify
+  * @param attributeName   of attribute to verify
   * @param driver web driver to use
   */
-final class Attribute(name: String)
+final class Attribute(attributeName: String)
                      (implicit driver: WebDriver)
   extends WebStep[StyleContext]
     with Eventually with WebPatience with Matchers with Locators {
@@ -43,17 +43,17 @@ final class Attribute(name: String)
         case Some(s) =>
           val element = driver.findElement(by.by(s))
           element.toString
-          withClue(s"For element $element attribute $name ") {
+          withClue(s"For element $element attribute $attributeName ") {
             textValue match {
-              case Some(t) if name == "tag" => element.getTagName should be(t)
-              case Some(t) => element getAttribute name should be(t)
-              case None if name == "tag" => throw new NotAllowedException(
+              case Some(t) if attributeName == "tag" => element.getTagName should be(t)
+              case Some(t) => element getAttribute attributeName should be(t)
+              case None if attributeName == "tag" => throw new NotAllowedException(
                 s"For element $element please define tag name.", 0)
-              case None => element getAttribute name should not be empty
+              case None => element getAttribute attributeName should not be empty
             }
           }
         case None => throw new NotAllowedException(
-          s"For style $name please define selector of web element.", 0)
+          s"For attribute $attributeName please define selector of web element.", 0)
       }
     }
   }

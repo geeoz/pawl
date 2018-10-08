@@ -22,15 +22,16 @@ import scala.collection.mutable.ArrayBuffer
 
 /** <code>BaseSpec</code> a simple trait for PAWL DSL.
   */
-trait BaseSpec extends FlatSpec with Bundle {
+trait BaseSpec extends FlatSpec with BeforeAndAfterEach with Bundle {
   this: Suite =>
   /** Array of the steps for execution */
   private lazy val scenario = ArrayBuffer[Step[_]]()
 
-  /** Execute last step.
-    */
-  implicit override def convertAnyToAssertion(a: Any): Assertion = {
-    scenario foreach (_.execute())
+  private def executeScenario = {
+    if (scenario.nonEmpty) {
+      scenario foreach (_.execute())
+      scenario clear()
+    }
     Succeeded
   }
 
@@ -45,12 +46,17 @@ trait BaseSpec extends FlatSpec with Bundle {
       * @return step clarification object
       */
     protected def add[T](s: Step[T]): T = {
-      if (scenario.nonEmpty) {
-        scenario foreach (_.execute())
-        scenario clear()
-      }
+      executeScenario
       scenario += s
       s.clarification()
     }
   }
+
+  /** Execute last step if previous not failed.
+    */
+  override def withFixture(test: NoArgTest): Outcome =
+    super.withFixture(test) match {
+      case Succeeded => executeScenario
+      case any: Outcome => any
+    }
 }

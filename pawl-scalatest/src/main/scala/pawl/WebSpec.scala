@@ -31,7 +31,7 @@ import pawl.web.step._
 
 /** <code>WebSpec</code> a simple trait for PAWL WEB DSL.
   */
-trait WebSpec extends BaseSpec with BeforeAndAfter with Locators with Matchers{
+trait WebSpec extends BaseSpec with Locators with Matchers {
   this: Suite =>
 
   lazy val Guest = this
@@ -139,7 +139,9 @@ trait WebSpec extends BaseSpec with BeforeAndAfter with Locators with Matchers{
   }
 
   /** Quits this driver, closing every associated window. */
-  after {
-    driver.quit()
+  override protected def afterEach(): Unit = {
+    try super.afterEach()
+    finally driver.quit()
   }
+
 }

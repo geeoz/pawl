@@ -5,7 +5,7 @@ before_install:
   - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in ./project/travis/travis.pubring.asc.enc -out local.pubring.asc -d
 
 addons:
-  firefox: '50.0.2'
+  firefox: "61.0.2"
 
 language: scala
 
@@ -16,7 +16,7 @@ before_install:
 
 matrix:
   include:
-  - scala: 2.11.8
+  - scala: 2.12.4
     jdk: oraclejdk8
     script:
       - sbt ';compile;test;package;it:test'

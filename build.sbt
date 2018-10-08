@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
+// the Scala version that will be used for cross-compiled libraries
+scalaVersion in ThisBuild := "2.12.4"
+// the scapegoat static code analysis
+scapegoatVersion in ThisBuild := "1.3.2"
+
 import scala.xml.XML
 
 val mainDirectory = settingKey[File]("Main base directory of the project.")
 val build = taskKey[Unit]("Project full build task.")
 val sca = taskKey[Unit]("Project static code analysis task.")
 
-lazy val buildSettings = Dependencies.Scala ++ graphSettings ++
-  filterSettings ++
-  findbugsSettings ++
-  PmdPlugin.projectSettings ++
+lazy val buildSettings = Dependencies.Scala ++ //graphSettings ++
+//  filterSettings ++
+//  findbugsSettings ++
+//  PmdPlugin.projectSettings ++
   Publish.settings ++ Seq(
   organization := "com.geeoz.pawl",
   organizationName := "Geeoz Software",
@@ -35,16 +40,16 @@ lazy val buildSettings = Dependencies.Scala ++ graphSettings ++
     "-Xlint:unchecked", "-Xlint:deprecation"),
   updateOptions := updateOptions.value.withCachedResolution(true),
   logLevel := Level.Info,
-  jcheckStyleConfig := mainDirectory.value.getPath + "/checkstyle.xml",
-  pmdRuleSet := mainDirectory.value.getPath + "/pmd-ruleset.xml",
-  findbugsExcludeFilters := Some(XML.loadFile(mainDirectory.value / "findbugs-exclude.xml")),
+//  jcheckStyleConfig := mainDirectory.value.getPath + "/checkstyle.xml",
+//  pmdRuleSet := mainDirectory.value.getPath + "/pmd-ruleset.xml",
+//  findbugsExcludeFilters := Some(XML.loadFile(mainDirectory.value / "findbugs-exclude.xml")),
   sca := {},
-  sca <<= sca dependsOn(
-    jcheckStyle in Compile, scalastyle.in(Compile).toTask(""), scapegoat in Scapegoat, findbugs in Compile, pmd),
+//  sca <<= sca dependsOn(
+//    jcheckStyle in Compile, scalastyle.in(Compile).toTask(""), scapegoat in Scapegoat, findbugs in Compile, pmd),
   build := {},
-  build <<= build dependsOn(clean in Compile, compile in Compile, test in Test, publishLocal in Compile),
-  build in IntegrationTest <<= (build in IntegrationTest) dependsOn(
-    clean in Compile, compile in Compile, test in Test, sca, publishLocal in IntegrationTest)
+  build := build.dependsOn(clean in Compile, compile in Compile, test in Test, publishLocal in Compile).value,
+  build in IntegrationTest := (build in IntegrationTest).dependsOn(
+    clean in Compile, compile in Compile, test in Test, sca, publishLocal in IntegrationTest).value
 )
 
 lazy val pawl = (project in file(".")).
@@ -55,8 +60,8 @@ lazy val pawl = (project in file(".")).
     name := "pawl",
     description := "A project to aid with test automation.",
     mainDirectory := baseDirectory.value,
-    findbugs in Compile := {},
-    pmd := {}
+    findbugs in Compile := {}//,
+//    pmd := {}
   )
 
 lazy val `pawl-scalatest` = (project in file("pawl-scalatest")).
@@ -69,7 +74,7 @@ lazy val `pawl-scalatest` = (project in file("pawl-scalatest")).
     mainDirectory := baseDirectory.value.getParentFile,
     Dependencies.pawlScalaTest,
     // FIXME update Scalastyle plugin
-    sca := {},
-    sca <<= sca dependsOn(
-      jcheckStyle in Compile, scapegoat in Scapegoat, findbugs in Compile, pmd)
+    sca := {}
+//    sca <<= sca dependsOn(
+//      jcheckStyle in Compile, scapegoat in Scapegoat, findbugs in Compile, pmd)
   )

@@ -19,7 +19,7 @@ import sbt._
 
 object Dependencies {
   val Scala = Seq(
-    scalaVersion := "2.11.8"
+    scalaVersion := "2.12.4"
   )
 
   // Typesafe Config Factory
@@ -27,9 +27,9 @@ object Dependencies {
   // Hamcrest matchers
   val hamcrestVersion       = "1.3"           // EPL-1.0
   // ScalaTest
-  val scalaTestVersion      = "3.0.0-SNAP6"   // ApacheV2
+  val scalaTestVersion      = "3.0.5"   // ApacheV2
   // Browser automation framework
-  val seleniumVersion       = "3.0.1"        // ApacheV2
+  val seleniumVersion       = "3.14.0"        // ApacheV2
 
   object Compile {
     val config              = "com.typesafe" % "config" % configVersion

@@ -25,7 +25,7 @@ create_webdav_folders () {
     fi
 
     path="${path}/${folder}"
-    status=`curl --user $WEBDAV_USER "${WEBDAV}${path}" -sw "%{http_code}"`
+    status=`curl --user $WEBDAV_USER "${WEBDAV}${path}" -sw "%{http_code}" -o /dev/null -I`
 
     if [ "${status}" == "404" ]; then
       curl --user $WEBDAV_USER -X MKCOL "${WEBDAV}${path}"
