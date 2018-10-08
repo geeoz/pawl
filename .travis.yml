@@ -5,14 +5,13 @@ before_install:
   - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in ./project/travis/travis.pubring.asc.enc -out local.pubring.asc -d
 
 addons:
-  firefox: "61.0.2"
+  chrome: stable
 
 language: scala
 
 before_install:
   - "export DISPLAY=:99.0"
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x16"
-  - ./project/travis/install-geckodriver.sh
 
 matrix:
   include:
