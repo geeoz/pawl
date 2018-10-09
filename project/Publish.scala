@@ -33,6 +33,14 @@ object Publish {
     pgpPublicRing := file("local.pubring.asc"),
     pgpPassphrase := Some(sys.env.getOrElse("PGP_PASSPHRASE", "").toCharArray),
     publishArtifact in Test := false,
+    publishTo := {
+      val nexus = "https://oss.sonatype.org/"
+      if (isSnapshot.value) {
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      } else {
+        Some("releases" at nexus + "service/local/staging/deploy/maven2")
+      }
+    },
     pomExtra :=
         <url>https://github.com/geeoz/pawl</url>
 
